@@ -321,10 +321,6 @@ theorem map_reverseAux (f : α → β) (l₁ l₂ : List α) :
     map f (reverseAux l₁ l₂) = reverseAux (map f l₁) (map f l₂) := by
   simp only [reverseAux_eq, map_append, map_reverse]
 
-/-! ### empty -/
-
-theorem isEmpty_iff_eq_nil {l : List α} : l.isEmpty ↔ l = [] := by cases l <;> simp [isEmpty]
-
 /-! ### dropLast -/
 
 /-! ### getLast -/
@@ -561,9 +557,6 @@ theorem get_cons {l : List α} {a : α} {n} (hl) :
   cases n
   · contradiction
   rfl
-
-theorem modifyHead_modifyHead (l : List α) (f g : α → α) :
-    (l.modifyHead f).modifyHead g = l.modifyHead (g ∘ f) := by cases l <;> simp
 
 /-! ### Induction from the right -/
 

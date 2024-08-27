@@ -27,7 +27,7 @@ abbrev considerFstAs {S M : Type*} (R : Type*) [CommSemiring S] [Semiring R] [Al
 abbrev combine {α : Type*} (f : α → α → α) (fL : α → α) (fR : α → α) :
     List (α × ℕ) → List (α × ℕ) → List (α × ℕ)
   | [], l => l.onFst fR
-  | l, [] => l.onFst fL
+  | l@(_ :: _), [] => l.onFst fL
   | (a₁, k₁) :: t₁, (a₂, k₂) :: t₂ =>
     if k₁ < k₂ then
       (fL a₁, k₁) :: combine f fL fR t₁ ((a₂, k₂) :: t₂)
@@ -200,18 +200,25 @@ partial def parse {v : Level} (M : Q(Type v)) (iM : Q(AddCommMonoid $M)) (x : Q(
     let ⟨_, _, iMR₁, l₁', pf₁'⟩ ← parse M iM x₁
     let ⟨_, _, iMR₂, l₂', pf₂'⟩ ← parse M iM x₂
     -- lift from the semirings of scalars parsed from `x₁`, `x₂` (say `R₁`, `R₂`) to `R₁ ⊗ R₂`
-    let ⟨R, iR, iMR, l₁, l₂, pf₁, pf₂⟩ ← matchRings M iM x₁ x₂ iMR₁ l₁' pf₁' iMR₂ l₂' pf₂'
-    pure ⟨R, iR, iMR, combine (cob iR) id id l₁ l₂, q(sorry)⟩
+    let ⟨R, iR, iMR, l₁, l₂, (pf₁ : Q($x₁ = smulAndSum $((l₁.map Prod.fst).quote))),
+      (pf₂ : Q($x₂ = smulAndSum $((l₂.map Prod.fst).quote)))⟩
+      ← matchRings M iM x₁ x₂ iMR₁ l₁' pf₁' iMR₂ l₂' pf₂'
+    -- build the new list and proof
+    let l := combine (cob iR) id id l₁ l₂
+    let pf : Q(smulAndSum $((l₁.map Prod.fst).quote) + smulAndSum $((l₂.map Prod.fst).quote)
+      = smulAndSum $((l.map Prod.fst).quote)) := q(sorry)
+    pure ⟨R, iR, iMR, l, q(Eq.trans (congrArg₂ (· + ·) $pf₁ $pf₂) $pf)⟩
   -- parse a subtraction: `x₁ - x₂`
   | ~q(@HSub.hSub _ _ _ (@instHSub _ $iM') $x₁ $x₂) =>
     let ⟨R₁, iR₁, iMR₁, l₁, pf₁⟩ ← parse M iM x₁
     let ⟨R₂, iR₂, iMR₂, l₂, pf₂⟩ ← parse M iM x₂
-    let iZ ← synthInstanceQ q(Semiring ℤ)
+    -- lift from the semirings of scalars parsed from `x₁`, `x₂` (say `R₁`, `R₂`) to `R₁ ⊗ R₂ ⊗ ℤ`
     let iMZ ← synthInstanceQ q(Module ℤ $M)
-    let ⟨R₁', iR₁', iMR₁', l₁', pf₁'⟩ ← liftRing M iM x₁ iMR₁ l₁ pf₁ q(ℤ) iZ iMZ
-    let ⟨R₂', iR₂', iMR₂', l₂', pf₂'⟩ ← liftRing M iM x₂ iMR₂ l₂ pf₂ q(ℤ) iZ iMZ
+    let ⟨R₁', iR₁', iMR₁', l₁', pf₁'⟩ ← liftRing M iM x₁ iMR₁ l₁ pf₁ q(ℤ) q(Int.instSemiring) iMZ
+    let ⟨R₂', iR₂', iMR₂', l₂', pf₂'⟩ ← liftRing M iM x₂ iMR₂ l₂ pf₂ q(ℤ) q(Int.instSemiring) iMZ
     let ⟨R, iR, iMR, l₁'', l₂'', pf₁'', pf₂''⟩ ← matchRings M iM x₁ x₂ iMR₁' l₁' pf₁' iMR₂' l₂' pf₂'
     let iR' ← synthInstanceQ q(Ring $R)
+    -- build the new list and proof
     pure ⟨R, iR, iMR, combine (boc iR') id (bco iR') l₁'' l₂'', q(sorry)⟩
   -- parse a negation: `-y`
   | ~q(@Neg.neg _ $iM' $y) =>
@@ -223,6 +230,7 @@ partial def parse {v : Level} (M : Q(Type v)) (iM : Q(AddCommMonoid $M)) (x : Q(
     let ⟨R, iR, iMR, l, pf⟩ ← liftRing M iM y iMR₀ l₀ pf₀ q(ℤ) iZ iMZ
     let _i' ← synthInstanceQ q(Ring $R)
     assumeInstancesCommute
+    -- build the new list and proof
     let qneg : Q($R × $M) → Q($R × $M) := fun (p : Q($R × $M)) ↦ q((- Prod.fst $p, Prod.snd $p))
     have pf_right :
         Q(List.onFst $((l.map Prod.fst).quote) Neg.neg = $(((l.onFst qneg).map Prod.fst).quote)) :=
@@ -237,8 +245,8 @@ partial def parse {v : Level} (M : Q(Type v)) (iM : Q(AddCommMonoid $M)) (x : Q(
     let i₂ ← synthInstanceQ q(Module $S $M)
     assumeInstancesCommute
     -- lift from original semiring of scalars (say `R₀`) to `R₀ ⊗ S`
-    let ⟨R, iR, iMR, l, (pf₂ : Q($y = smulAndSum $((l.map Prod.fst).quote))), s,
-      (pf₁ : Q($s₀ • $y = $s • $y))⟩ ← matchRings' M iM y iMR₀ l₀ pf₀ i₁ i₂ s₀
+    let ⟨R, iR, iMR, l, pf₂, s, pf₁⟩ ← matchRings' M iM y iMR₀ l₀ pf₀ i₁ i₂ s₀
+    -- build the new list and proof
     let sl : List (Q($R × $M) × ℕ) := l.onFst (fun p ↦ q(($s * Prod.fst $p, Prod.snd $p)))
     let pf₃ : Q((List.onFst $((l.map Prod.fst).quote) ($s * ·)) = $((sl.map Prod.fst).quote)) :=
       l.map_quote_map_fst q($R × $M) q(fun p ↦ ($s * p.1, p.2))

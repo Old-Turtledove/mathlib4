@@ -225,26 +225,31 @@ def asdf {v : Level} {M : Q(Type v)} {R : Q(Type)} {iR : Q(Semiring $R)} {iM : Q
     let z₂ : Q(List ($R × $M)) := (t₂.map Prod.fst).quote
     let l₁ : Q(List ($R × $M)) :=
       List.quote ((combine (cob iR) id id t₁ ((a₂, k₂) :: t₂)).map Prod.fst)
+    let A : Q($R × $M) := cob iR a₁ a₂
     let l₂ : Q(List ($R × $M)) :=
-      List.quote (cob iR a₁ a₂ :: (combine (cob iR) id id t₁ t₂).map Prod.fst)
+      List.quote ((combine (cob iR) id id t₁ t₂).map Prod.fst)
     let l₃ : Q(List ($R × $M)) :=
       List.quote ((combine (cob iR) id id ((a₁, k₁) :: t₁) t₂).map Prod.fst)
     let pf₁ : Q($a₁.1 • $a₁.2 + (smulAndSum $z₁ + smulAndSum ($a₂ :: $z₂))
         = $a₁.1 • $a₁.2 + smulAndSum $l₁) :=
       q(congrArg _ $(asdf iRM t₁ ((a₂, k₂) :: t₂)))
+    let pf₂' : Q(($a₁.1 • $a₁.2 + $a₂.1 • $a₂.2) = $A.1 • $A.2) :=
+      (q(Eq.symm (add_smul $a₁.1 $a₂.1 $A.2)):)
     let pf₂ : Q(($a₁.1 • $a₁.2 + $a₂.1 • $a₂.2) + (smulAndSum $z₁ + smulAndSum $z₂)
-      = smulAndSum $l₂) := q(sorry)
+        = $A.1 • $A.2 + smulAndSum $l₂) :=
+      q(congrArg₂ (· + ·) $pf₂' $(asdf iRM t₁ t₂))
     let pf₃ : Q($a₂.1 • $a₂.2 + (smulAndSum ($a₁ :: $z₁) + smulAndSum $z₂)
         = $a₂.1 • $a₂.2 +  smulAndSum $l₃) :=
       q(congrArg _ $(asdf iRM ((a₁, k₁) :: t₁) t₂))
     let l' : Q(List ($R × $M)) :=
-      if k₁ < k₂ then q($a₁ :: $l₁) else if k₁ = k₂ then l₂ else q($a₂ :: $l₃)
+      if k₁ < k₂ then q($a₁ :: $l₁) else if k₁ = k₂ then q($A :: $l₂) else q($a₂ :: $l₃)
     let pf_lhs : Q((smulAndSum ($a₁ :: $z₁)) + (smulAndSum ($a₂ :: $z₂)) = smulAndSum $l') :=
       if k₁ < k₂ then
         (q(Eq.trans (smulAndSum_cons_add_cons₁ _ _ _ _)
           (Eq.trans $pf₁ (Eq.symm (smulAndSum_cons _ _)))) : Expr)
       else if k₁ = k₂ then
-        (q(Eq.trans (smulAndSum_cons_add_cons₂ _ _ _ _) $pf₂) : Expr)
+        (q(Eq.trans (smulAndSum_cons_add_cons₂ _ _ _ _)
+          (Eq.trans $pf₂ (Eq.symm (smulAndSum_cons _ _)))) : Expr)
       else
         (q(Eq.trans (smulAndSum_cons_add_cons₃ _ _ _ _)
           (Eq.trans $pf₃ (Eq.symm (smulAndSum_cons _ _)))) : Expr)

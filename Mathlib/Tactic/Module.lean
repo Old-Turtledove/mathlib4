@@ -215,24 +215,27 @@ def asdf {v : Level} {M : Q(Type v)} {R : Q(Type)} {iR : Q(Semiring $R)} {iM : Q
     Q(smulAndSum $((l₁.map Prod.fst).quote) + smulAndSum $((l₂.map Prod.fst).quote)
       = smulAndSum $(((combine (cob iR) id id l₁ l₂).map Prod.fst).quote)) :=
   match l₁, l₂ with
-  | [], l => q(sorry)
-  | a :: l, [] => q(sorry)
+  | [], l => (q(zero_add (smulAndSum $((l.map Prod.fst).quote))):)
+  | l@(_ :: _), [] => (q(add_zero (smulAndSum $((l.map Prod.fst).quote))):)
   | (a₁, k₁) :: t₁, (a₂, k₂) :: t₂ =>
     let z₁ : Q(List ($R × $M)) := (t₁.map Prod.fst).quote
     let z₂ : Q(List ($R × $M)) := (t₂.map Prod.fst).quote
     let l₁ : Q(List ($R × $M)) :=
-      q($a₁ :: $(List.quote ((combine (cob iR) id id t₁ ((a₂, k₂) :: t₂)).map Prod.fst)))
+      List.quote ((combine (cob iR) id id t₁ ((a₂, k₂) :: t₂)).map Prod.fst)
     let l₂ : Q(List ($R × $M)) :=
       List.quote (cob iR a₁ a₂ :: (combine (cob iR) id id t₁ t₂).map Prod.fst)
     let l₃ : Q(List ($R × $M)) :=
-      q($a₂ :: $(List.quote ((combine (cob iR) id id ((a₁, k₁) :: t₁) t₂).map Prod.fst)))
-    let pf₁ : Q($a₁.1 • $a₁.2 + (smulAndSum $z₁ + smulAndSum ($a₂ :: $z₂)) = smulAndSum $l₁) :=
+      List.quote ((combine (cob iR) id id ((a₁, k₁) :: t₁) t₂).map Prod.fst)
+    let pf₁ :
+        Q($a₁.1 • $a₁.2 + (smulAndSum $z₁ + smulAndSum ($a₂ :: $z₂)) = smulAndSum ($a₁ :: $l₁)) :=
       q(sorry)
     let pf₂ : Q(($a₁.1 • $a₁.2 + $a₂.1 • $a₂.2) + (smulAndSum $z₁ + smulAndSum $z₂)
       = smulAndSum $l₂) := q(sorry)
-    let pf₃ : Q($a₂.1 • $a₂.2 + (smulAndSum ($a₁ :: $z₁) + smulAndSum $z₂) = smulAndSum $l₃) :=
+    let pf₃ :
+        Q($a₂.1 • $a₂.2 + (smulAndSum ($a₁ :: $z₁) + smulAndSum $z₂) = smulAndSum ($a₂ :: $l₃)) :=
       q(sorry)
-    let l' : Q(List ($R × $M)) := if k₁ < k₂ then l₁ else if k₁ = k₂ then l₂ else l₃
+    let l' : Q(List ($R × $M)) :=
+      if k₁ < k₂ then q($a₁ :: $l₁) else if k₁ = k₂ then l₂ else q($a₂ :: $l₃)
     let pf_lhs : Q((smulAndSum ($a₁ :: $z₁)) + (smulAndSum ($a₂ :: $z₂)) = smulAndSum $l') :=
       if k₁ < k₂ then
         (q(Eq.trans (smulAndSum_cons_add_cons₁ _ _ _ _) $pf₁) : Expr)

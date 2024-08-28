@@ -32,6 +32,21 @@ abbrev considerFstAs {S M : Type*} (R : Type*) [CommSemiring S] [Semiring R] [Al
     (S × M) → (R × M) :=
   fun ⟨s, x⟩ ↦ (algebraMap S R s, x)
 
+theorem smulAndSum_considerFstAs {S : Type*} (R : Type*) {M : Type*} [CommSemiring S] [Semiring R]
+    [Algebra S R] [AddMonoid M] [SMul S M] [MulAction R M] [IsScalarTower S R M]
+    (l : List (S × M)) :
+    smulAndSum (l.map (considerFstAs R)) = smulAndSum l := by
+  simp only [smulAndSum, List.map_map]
+  congr
+  ext
+  simp [IsScalarTower.algebraMap_smul]
+
+theorem eq_smulAndSum_considerFstAs {S : Type*} (R : Type*) {M : Type*} [CommSemiring S]
+    [Semiring R] [Algebra S R] [AddMonoid M] [SMul S M] [MulAction R M] [IsScalarTower S R M]
+    {x : M} {l : List (S × M)} (h : x = smulAndSum l) :
+    x = smulAndSum (l.map (considerFstAs R)) := by
+  rw [smulAndSum_considerFstAs, h]
+
 abbrev combine {α : Type*} (f : α → α → α) (fL : α → α) (fR : α → α) :
     List (α × ℕ) → List (α × ℕ) → List (α × ℕ)
   | [], l => l.onFst fR
@@ -104,14 +119,14 @@ def matchRings {v : Level} (M : Q(Type v)) (iM : Q(AddCommMonoid $M)) (x₁ x₂
     let _i₄ ← synthInstanceQ q(IsScalarTower $R₁ $R₂ $M)
     assumeInstancesCommute
     let l₁' : List (Q($R₂ × $M) × ℕ) := l₁.onFst (fun p ↦ q(considerFstAs $R₂ $p))
-    pure ⟨R₂, iR₂, iRM₂, l₁', l₂, q(sorry), pf₂⟩
+    pure ⟨R₂, iR₂, iRM₂, l₁', l₂, (q(eq_smulAndSum_considerFstAs $R₂ $pf₁):), pf₂⟩
   catch _ =>
     let _i₁ ← synthInstanceQ q(CommSemiring $R₂)
     let _i₃ ← synthInstanceQ q(Algebra $R₂ $R₁)
     let _i₄ ← synthInstanceQ q(IsScalarTower $R₂ $R₁ $M)
     assumeInstancesCommute
     let l₂' : List (Q($R₁ × $M) × ℕ) := l₂.onFst (fun p ↦ q(considerFstAs $R₁ $p))
-    pure ⟨R₁, iR₁, iRM₁, l₁, l₂', pf₁, q(sorry)⟩
+    pure ⟨R₁, iR₁, iRM₁, l₁, l₂', pf₁, (q(eq_smulAndSum_considerFstAs $R₁ $pf₂):)⟩
 
 def matchRings' {v : Level} (M : Q(Type v)) (iM : Q(AddCommMonoid $M)) (x : Q($M))
     {R₁ : Q(Type)} {iR₁ : Q(Semiring $R₁)} (iRM₁ : Q(@Module $R₁ $M $iR₁ $iM))
@@ -133,12 +148,7 @@ def matchRings' {v : Level} (M : Q(Type v)) (iM : Q(AddCommMonoid $M)) (x : Q($M
     assumeInstancesCommute
     let l' : List (Q($R₂ × $M) × ℕ) := l.onFst (fun p ↦ q(considerFstAs $R₂ $p))
     let pf' : Q($r₂ • $x = $r₂ • $x) := q(rfl)
-    let L : List Q($R₁ × $M) := l.map Prod.fst
-    let L' : List Q($R₂ × $M) := L.map (fun p ↦ q(considerFstAs $R₂ $p))
-    let pf'' : Q(smulAndSum $(L.quote) = smulAndSum $(L'.quote)) := q(sorry)
-    let pf''' : Q(smulAndSum $((l.map Prod.fst).quote) = smulAndSum $((l'.map Prod.fst).quote)) :=
-      pf''
-    pure ⟨R₂, iR₂, iRM₂, l', q(Eq.trans $pf $pf'''), r₂, pf'⟩
+    pure ⟨R₂, iR₂, iRM₂, l', (q(eq_smulAndSum_considerFstAs $R₂ $pf):), r₂, pf'⟩
   catch _ =>
     let _i₁ ← synthInstanceQ q(CommSemiring $R₂)
     let _i₃ ← synthInstanceQ q(Algebra $R₂ $R₁)
@@ -170,7 +180,7 @@ def liftRing {v : Level} (M : Q(Type v)) (iM : Q(AddCommMonoid $M)) (x₁ : Q($M
     let _i₄ ← synthInstanceQ q(IsScalarTower $R₁ $R₂ $M)
     assumeInstancesCommute
     let l₁' : List (Q($R₂ × $M) × ℕ) := l₁.onFst (fun p ↦ q(considerFstAs $R₂ $p))
-    pure ⟨R₂, iR₂, iRM₂, l₁', q(sorry)⟩
+    pure ⟨R₂, iR₂, iRM₂, l₁', (q(eq_smulAndSum_considerFstAs $R₂ $pf₁):)⟩
 
 
 theorem smulAndSum_cons_add_cons₁ {R : Type*} {M : Type*} [SMul R M] [AddMonoid M]

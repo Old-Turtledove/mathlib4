@@ -232,14 +232,18 @@ theorem smulAndSum_cons_sub_cons₃ {R : Type*} {M : Type*} [SMul R M] [AddCommG
   simp [smulAndSum_cons]
   abel
 
-theorem neg_eq_smulAndSum {M : Type*} [AddCommGroup M] {R : Type*} [Ring R] [Module R M]
-    {l : List (R × M)} {x : M} (h : x = smulAndSum l) :
-    - x = smulAndSum (l.onFst Neg.neg) := by
-  unfold smulAndSum at h ⊢
-  simp only [List.map_map, h, List.sum_neg]
+theorem smulAndSum_neg {M : Type*} [AddCommGroup M] {R : Type*} [Ring R] [Module R M]
+    (l : List (R × M)) :
+    smulAndSum (l.onFst Neg.neg) = - smulAndSum l := by
+  simp only [smulAndSum, List.map_map, List.sum_neg]
   congr
   ext p
   simp
+
+theorem neg_eq_smulAndSum {M : Type*} [AddCommGroup M] {R : Type*} [Ring R] [Module R M]
+    {l : List (R × M)} {x : M} (h : x = smulAndSum l) :
+    - x = smulAndSum (l.onFst Neg.neg) := by
+  simpa [smulAndSum_neg]
 
 theorem smul_eq_smulAndSum {M : Type*} [AddCommMonoid M] {R : Type*} [Semiring R] [Module R M]
     {l : List (R × M)} {x : M} (h : x = smulAndSum l) (r : R) :
@@ -327,7 +331,13 @@ def mkSmulAndSum_sub {v : Level} {M : Q(Type v)} {R : Q(Type)} (iR : Q(Ring $R))
     Q(smulAndSum $((l₁.map Prod.fst).quote) - smulAndSum $((l₂.map Prod.fst).quote)
       = smulAndSum $(((combine (boc iR) id (bco iR) l₁ l₂).map Prod.fst).quote)) :=
   match l₁, l₂ with
-  | [], l => q(sorry) --(q(zero_sub (smulAndSum $((l.map Prod.fst).quote))):)
+  | [], l =>
+    let L := l.map Prod.fst
+    let pf₁ : Q(0 - smulAndSum $(L.quote) = - smulAndSum $(L.quote)) :=
+      (q(zero_sub (smulAndSum $(L.quote))):)
+    let pf₂ : Q(smulAndSum $((L.map (bco iR)).quote) = - smulAndSum $(L.quote)) :=
+      (q(smulAndSum_neg $(L.quote)):)
+    (q(Eq.trans $pf₁ (Eq.symm $pf₂)):)
   | l@(_ :: _), [] => (q(sub_zero (smulAndSum $((l.map Prod.fst).quote))):)
   | (a₁, k₁) :: t₁, (a₂, k₂) :: t₂ =>
     let z₁ : Q(List ($R × $M)) := (t₁.map Prod.fst).quote

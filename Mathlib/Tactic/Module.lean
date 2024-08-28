@@ -221,11 +221,11 @@ def asdf {v : Level} {M : Q(Type v)} {R : Q(Type)} {iR : Q(Semiring $R)} {iM : Q
     let z₁ : Q(List ($R × $M)) := (t₁.map Prod.fst).quote
     let z₂ : Q(List ($R × $M)) := (t₂.map Prod.fst).quote
     let l₁ : Q(List ($R × $M)) :=
-      List.quote (a₁ :: (combine (cob iR) id id t₁ ((a₂, k₂) :: t₂)).map Prod.fst)
+      q($a₁ :: $(List.quote ((combine (cob iR) id id t₁ ((a₂, k₂) :: t₂)).map Prod.fst)))
     let l₂ : Q(List ($R × $M)) :=
       List.quote (cob iR a₁ a₂ :: (combine (cob iR) id id t₁ t₂).map Prod.fst)
     let l₃ : Q(List ($R × $M)) :=
-      List.quote (a₂ :: (combine (cob iR) id id ((a₁, k₁) :: t₁) t₂).map Prod.fst)
+      q($a₂ :: $(List.quote ((combine (cob iR) id id ((a₁, k₁) :: t₁) t₂).map Prod.fst)))
     let pf₁ : Q($a₁.1 • $a₁.2 + (smulAndSum $z₁ + smulAndSum ($a₂ :: $z₂)) = smulAndSum $l₁) :=
       q(sorry)
     let pf₂ : Q(($a₁.1 • $a₁.2 + $a₂.1 • $a₂.2) + (smulAndSum $z₁ + smulAndSum $z₂)

@@ -213,6 +213,21 @@ theorem smul_eq_smulAndSum {M : Type*} [AddCommMonoid M] {R : Type*} [Semiring R
   ext p
   simp [mul_smul]
 
+theorem ite_eq_smulAndSum {M : Type*} [AddCommMonoid M] {R : Type*} [Semiring R] [Module R M]
+    (k₁ k₂ : ℕ) (l₁ l₂ l₃ : List ((R × M) × ℕ)) :
+    (if k₁ < k₂ then smulAndSum (l₁.map Prod.fst) else if k₁ = k₂ then smulAndSum (l₂.map Prod.fst) else smulAndSum (l₃.map Prod.fst))
+    = smulAndSum ((if k₁ < k₂ then l₁ else if k₁ = k₂ then l₂ else l₃).map Prod.fst) :=
+  sorry
+
+theorem askaf {α β : Type*} (k₁ k₂ : ℕ) (l₁ l₂ l₃ : List (α × β)) :
+    (if k₁ < k₂ then l₁.map Prod.fst else if k₁ = k₂ then l₂.map Prod.fst else l₃.map Prod.fst)
+    = (if k₁ < k₂ then l₁ else if k₁ = k₂ then l₂ else l₃).map Prod.fst :=
+  sorry
+
+def ugh {v : Level} {α : Q(Type v)} {a₁ a₂ : Q($α)} (h : a₁ = a₂) : Q($a₁ = $a₂) := by
+  rw [h]
+  exact q(rfl)
+
 def asdf {v : Level} {M : Q(Type v)} {R : Q(Type)} {iR : Q(Semiring $R)} {iM : Q(AddCommMonoid $M)}
     (iRM : Q(Module $R $M)) (l₁ l₂ : List (Q($R × $M) × ℕ)) :
     Q(smulAndSum $((l₁.map Prod.fst).quote) + smulAndSum $((l₂.map Prod.fst).quote)
@@ -253,15 +268,27 @@ def asdf {v : Level} {M : Q(Type v)} {R : Q(Type)} {iR : Q(Semiring $R)} {iM : Q
       else
         (q(Eq.trans (smulAndSum_cons_add_cons₃ _ _ _ _)
           (Eq.trans $pf₃ (Eq.symm (smulAndSum_cons _ _)))) : Expr)
-    let l : Q(List ($R × $M)) := List.quote <| List.map Prod.fst <|
+    let p₁ : List (Q($R × $M) × ℕ) := (a₁, k₁) :: combine (cob iR) id id t₁ ((a₂, k₂) :: t₂)
+    let p₂ : List (Q($R × $M) × ℕ) := (cob iR a₁ a₂, k₁) :: combine (cob iR) id id t₁ t₂
+    let p₃ : List (Q($R × $M) × ℕ) := (a₂, k₂) :: combine (cob iR) id id ((a₁, k₁) :: t₁) t₂
+    let l'' : (List Q($R × $M)) :=
       if k₁ < k₂ then
-        (a₁, k₁) :: combine (cob iR) id id t₁ ((a₂, k₂) :: t₂)
+        List.map Prod.fst <| p₁
       else if k₁ = k₂ then
-        (cob iR a₁ a₂, k₁) :: combine (cob iR) id id t₁ t₂
+        List.map Prod.fst <| p₂
       else
-        (a₂, k₂) :: combine (cob iR) id id ((a₁, k₁) :: t₁) t₂
-    let pf_rhs' : Q($l' = $l) := q(sorry) -- juggle `apply_ite`
-    let pf_rhs : Q(smulAndSum $l' = smulAndSum $l) := q(congrArg _ $pf_rhs')
+        List.map Prod.fst <| p₃
+    let l : (List Q($R × $M)) := List.map Prod.fst <|
+      if k₁ < k₂ then
+        p₁
+      else if k₁ = k₂ then
+        p₂
+      else
+        p₃
+    have e : l''.quote = l.quote := congrArg List.quote (askaf k₁ k₂ p₁ p₂ p₃)
+    let noooo : Q($(l''.quote) = $(l.quote)) := ugh e -- juggle `apply_ite`
+    let whyyy : Q($l' = $(l.quote)) := noooo
+    let pf_rhs : Q(smulAndSum $l' = smulAndSum $(l.quote)) := q(congrArg _ $whyyy)
     (q(Eq.trans $pf_lhs $pf_rhs):)
 
 /-- The main algorithm behind the `match_scalars` and `module` tactics: partially-normalizing an

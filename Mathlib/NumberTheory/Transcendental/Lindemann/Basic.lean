@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yuyang Zhao
 -/
 import Mathlib.Algebra.Order.Floor.Prime
+import Mathlib.Analysis.Complex.IsIntegral
 import Mathlib.NumberTheory.Transcendental.Lindemann.Init.AlgebraicPart
 import Mathlib.NumberTheory.Transcendental.Lindemann.Init.AnalyticalPart
 import Mathlib.NumberTheory.Transcendental.Lindemann.Init.SumAEvalARoots
@@ -221,13 +222,6 @@ theorem linear_independent_exp (u : ι → ℂ) (hu : ∀ i, IsIntegral ℚ (u i
       Nat.not_dvd_of_pos_of_lt (Int.natAbs_pos.mpr w0)
         (((le_max_right _ _).trans (le_max_right _ _)).trans_lt hqN)⟩
 
-theorem Complex.isIntegral_int_i : IsIntegral ℤ I := by
-  refine ⟨X ^ 2 + C 1, monic_X_pow_add_C _ two_ne_zero, ?_⟩
-  rw [eval₂_add, eval₂_X_pow, eval₂_C, I_sq, eq_intCast, Int.cast_one, neg_add_cancel]
-
-theorem Complex.isIntegral_rat_i : IsIntegral ℚ I :=
-  Complex.isIntegral_int_i.tower_top
-
 theorem transcendental_exp {a : ℂ} (a0 : a ≠ 0) (ha : IsAlgebraic ℤ a) :
     Transcendental ℤ (exp a) := by
   intro h
@@ -260,7 +254,7 @@ theorem transcendental_pi : Transcendental ℤ Real.pi := by
       (fun _ : Bool => 1) ?_ ?_
   · simpa only [Pi.zero_apply, one_ne_zero] using congr_fun this False
   · intro i; dsimp only; split_ifs
-    · exact is_integral_pi.mul Complex.isIntegral_rat_i
+    · exact is_integral_pi.mul Complex.isIntegral_rat_I
     · exact isIntegral_zero
   · intro i j; dsimp
     split_ifs <;>

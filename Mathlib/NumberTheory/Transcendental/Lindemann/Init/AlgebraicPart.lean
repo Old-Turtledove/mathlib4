@@ -291,8 +291,9 @@ def toConjLinearEquiv : mapDomainFixed s F ≃ₗ[F] GalConjClasses ℚ (K s) �
     toFun := toConjEquiv s F
     invFun := (toConjEquiv s F).symm
     map_add' := fun x y => by
-      ext i; simp_rw [Finsupp.coe_add, Pi.add_apply, toConjEquiv_apply_apply]
-      rfl
+      ext i
+      simp_rw [Finsupp.coe_add, Pi.add_apply, toConjEquiv_apply_apply, Subsemiring.coe_add,
+        (Finsupp.add_apply)]
     map_smul' := fun r x => by
       ext i; simp_rw [Finsupp.coe_smul, toConjEquiv_apply_apply]
       simp only [SetLike.val_smul, RingHom.id_apply]

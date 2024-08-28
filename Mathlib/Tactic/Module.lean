@@ -373,11 +373,14 @@ be added to the list of algebra-maps which get special-cased here?  (The lemma w
 elab "match_scalars" : tactic => Tactic.withMainContext <| Tactic.focus do
   Tactic.liftMetaTactic matchScalars
   Tactic.allGoals <|
-    Tactic.evalTactic <| ← `(tactic | push_cast [eq_natCast, eq_intCast, eq_ratCast])
+    Tactic.evalTactic <|
+      ← `(tactic | push_cast [eq_natCast, eq_intCast, eq_ratCast, -Int.reduceAdd, -Int.reduceNeg,
+        -Int.reduceEq, -Nat.reduceAdd])
 
 elab "module" : tactic => Tactic.withMainContext <| Tactic.focus do
   Tactic.liftMetaTactic matchScalars
   Tactic.allGoals <| do
     Tactic.evalTactic <|
-      ← `(tactic | (push_cast [eq_natCast, eq_intCast, eq_ratCast]; try ring1))
+      ← `(tactic | (push_cast [eq_natCast, eq_intCast, eq_ratCast, -Int.reduceAdd, -Int.reduceNeg,
+        -Int.reduceEq, -Nat.reduceAdd]; try ring1))
   Tactic.done

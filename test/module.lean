@@ -70,6 +70,12 @@ example : x + y = y + x := by module
 example : x + 2 • x = 2 • x + x := by module
 example : -x + x = 0 := by module
 
+example : x + y = y + x ∧ (↑((1:ℕ) + 1) : ℚ) = 2 := by
+  constructor
+  module -- do not focus this tactic: the double goal is the point of the test
+  guard_target =ₐ (↑((1:ℕ) + 1) : ℚ) = 2
+  norm_cast
+
 -- https://leanprover.zulipchat.com/#narrow/stream/287929-mathlib4/topic/Interaction.20of.20abel.20with.20casting/near/319895001
 example : True := by
   have : ∀ (p q r s : V), s + p - q = s - r - (q - r - p) := by
@@ -84,6 +90,20 @@ example : y = x + z - (x - y + z) := by
 
 -- https://leanprover.zulipchat.com/#narrow/stream/287929-mathlib4/topic/abel.20bug.3F/near/368707560
 example : -y + (z - x) = z - y - x := by module
+
+/--
+error: unsolved goals
+V : Type u_1
+K : Type
+t u v w x y z : V
+a b c d e f μ ν ρ : K
+inst✝ : AddCommGroup V
+⊢ -1 + 1 = 0
+-/
+-- this is a test to make sure the `push_neg` in `match_scalars` is not doing too much
+#guard_msgs in
+example : -x + x = 0 := by
+  match_scalars
 
 /-! ### Commutative ring -/
 

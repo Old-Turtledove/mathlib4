@@ -82,13 +82,6 @@ def List.quote {v : Level} {α : Q(Type v)} : List (Q($α)) → Q(List $α)
   | [] => q([])
   | e :: t => q($e :: $(t.quote))
 
-def List.map_quote_map_fst {v : Level} (α : Q(Type v)) (f : Q($α → $α)) :
-    ∀ (l : List (Q($α) × ℕ)),
-      Q(List.map $f $((l.map Prod.fst).quote)
-        = $(((l.map (fun ⟨p, k⟩ ↦ (q($f $p), k))).map Prod.fst).quote))
-  | [] => q(rfl)
-  | _ :: l => q(congrArg _ $(map_quote_map_fst α f l))
-
 def matchRings {v : Level} (M : Q(Type v)) (iM : Q(AddCommMonoid $M)) (x₁ x₂ : Q($M))
     {R₁ : Q(Type)} {iR₁ : Q(Semiring $R₁)} (iMR₁ : Q(@Module $R₁ $M $iR₁ $iM))
     (l₁ : List (Q($R₁ × $M) × ℕ)) (pf₁ : Q($x₁ = smulAndSum $((l₁.map Prod.fst).quote)))
@@ -232,12 +225,7 @@ partial def parse {v : Level} (M : Q(Type v)) (iM : Q(AddCommMonoid $M)) (x : Q(
     assumeInstancesCommute
     -- build the new list and proof
     let qneg : Q($R × $M) → Q($R × $M) := fun (p : Q($R × $M)) ↦ q((- Prod.fst $p, Prod.snd $p))
-    have pf_right :
-        Q(List.onFst $((l.map Prod.fst).quote) Neg.neg = $(((l.onFst qneg).map Prod.fst).quote)) :=
-      l.map_quote_map_fst q($R × $M) q(fun p ↦ (- p.1, p.2))
-    have pf_left : Q(-$y = smulAndSum (R := $R) (List.onFst $((l.map Prod.fst).quote) Neg.neg)) :=
-      q(neg_eq_smulAndSum $pf)
-    pure ⟨R, iR, iMR, l.onFst qneg, q(Eq.trans $pf_left (congrArg smulAndSum $pf_right))⟩
+    pure ⟨R, iR, iMR, l.onFst qneg, (q(neg_eq_smulAndSum $pf):)⟩
   -- parse a scalar multiplication: `(s₀ : S) • y`
   | ~q(@HSMul.hSMul _ _ _ (@instHSMul $S _ $iS) $s₀ $y) =>
     let ⟨_, _, iMR₀, l₀, pf₀⟩ ← parse M iM y
@@ -248,10 +236,7 @@ partial def parse {v : Level} (M : Q(Type v)) (iM : Q(AddCommMonoid $M)) (x : Q(
     let ⟨R, iR, iMR, l, pf₂, s, pf₁⟩ ← matchRings' M iM y iMR₀ l₀ pf₀ i₁ i₂ s₀
     -- build the new list and proof
     let sl : List (Q($R × $M) × ℕ) := l.onFst (fun p ↦ q(($s * Prod.fst $p, Prod.snd $p)))
-    let pf₃ : Q((List.onFst $((l.map Prod.fst).quote) ($s * ·)) = $((sl.map Prod.fst).quote)) :=
-      l.map_quote_map_fst q($R × $M) q(fun p ↦ ($s * p.1, p.2))
-    pure ⟨R, iR, iMR, sl,
-      q(Eq.trans (Eq.trans $pf₁ (smul_eq_smulAndSum $pf₂ $s)) (congrArg _ $pf₃))⟩
+    pure ⟨R, iR, iMR, sl, (q((Eq.trans $pf₁ (smul_eq_smulAndSum $pf₂ $s))) :)⟩
   -- parse a `(0:M)`
   | ~q(0) => pure ⟨q(Nat), q(Nat.instSemiring), q(AddCommGroup.toNatModule), [], q(zero_pf $M)⟩
   -- anything else should be treated as an atom

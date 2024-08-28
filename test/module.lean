@@ -68,7 +68,7 @@ example : x + y + (z + w - x) = y + z + w := by module
 example : x + y + z + (z - x - x) = (-1) • x + y + 2 • z := by module
 example : x + y = y + x := by module
 example : x + 2 • x = 2 • x + x := by module
-example : -x + x = 0 := by match_scalars
+example : -x + x = 0 := by module
 
 -- https://leanprover.zulipchat.com/#narrow/stream/287929-mathlib4/topic/Interaction.20of.20abel.20with.20casting/near/319895001
 example : True := by

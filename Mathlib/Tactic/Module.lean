@@ -326,6 +326,8 @@ def mkSmulAndSum_add {v : Level} {M : Q(Type v)} {R : Q(Type)} {iR : Q(Semiring 
     let pf_rhs : Q(smulAndSum $l' = smulAndSum $l) := (q(congrArg smulAndSum $noooo):)
     (q(Eq.trans $pf_lhs $pf_rhs):)
 
+example (a : ℤ) (b : ℚ) : (-a) • b = - (a • b) := neg_smul a b
+
 def mkSmulAndSum_sub {v : Level} {M : Q(Type v)} {R : Q(Type)} (iR : Q(Ring $R))
     (iM : Q(AddCommGroup $M)) (iRM : Q(Module $R $M)) (l₁ l₂ : List (Q($R × $M) × ℕ)) :
     Q(smulAndSum $((l₁.map Prod.fst).quote) - smulAndSum $((l₂.map Prod.fst).quote)
@@ -358,7 +360,7 @@ def mkSmulAndSum_sub {v : Level} {M : Q(Type v)} {R : Q(Type)} (iR : Q(Ring $R))
     let pf₂ : Q(($a₁.1 • $a₁.2 - $a₂.1 • $a₂.2) + (smulAndSum $z₁ - smulAndSum $z₂)
         = $A.1 • $A.2 + smulAndSum $l₂) :=
       q(congrArg₂ (· + ·) $pf₂' $(mkSmulAndSum_sub iR iM iRM t₁ t₂))
-    let pf₃' : Q(-($a₂.1 • $a₂.2) = $B.1 • $B.2) := q(sorry)
+    let pf₃' : Q(-($a₂.1 • $a₂.2) = $B.1 • $B.2) := q(Eq.symm (neg_smul _ _))
     let pf₃ : Q(-($a₂.1 • $a₂.2) + (smulAndSum ($a₁ :: $z₁) - smulAndSum $z₂)
         = $B.1 • $B.2 +  smulAndSum $l₃) :=
       q(congrArg₂ (· + ·) $pf₃' $(mkSmulAndSum_sub iR iM iRM ((a₁, k₁) :: t₁) t₂))

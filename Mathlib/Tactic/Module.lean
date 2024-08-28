@@ -75,12 +75,6 @@ abbrev bco {v : Level} {M : Q(Type v)} {R : Q(Type)} (_i₂ : Q(Ring $R))
     Q($R × $M) :=
   q(bco' $p)
 
-abbrev smulRightFst {R S M : Type*} [SMul S R] [SMul S M] (s : S) : R × M → R × M :=
-  fun ⟨r, x⟩ ↦ (s • r, x)
-
-abbrev smulLeftFst {R S M : Type*} [SMul R S] [SMul S M] (s : S) : R × M → S × M :=
-  fun ⟨r, x⟩ ↦ (r • s, x)
-
 theorem one_pf {M : Type*} [AddMonoid M] (x : M) : x = smulAndSum [((1:ℕ), x)] := by
   simp [smulAndSum]
 
@@ -100,7 +94,9 @@ def matchRings {v : Level} (M : Q(Type v)) (iM : Q(AddCommMonoid $M)) (x₁ x₂
       Q($x₁ = smulAndSum $((l₁.map Prod.fst).quote))
         × Q($x₂ = smulAndSum $((l₂.map Prod.fst).quote)) := do
   match ← isDefEqQ R₁ R₂ with
+  -- this case is handled separately, so as not to require commutativity if `R₁ = R₂`
   | .defEq (_ : $R₁ =Q $R₂) => pure ⟨R₁, iR₁, iRM₁, l₁, l₂, pf₁, pf₂⟩
+  -- otherwise the "smaller" of the two rings must be commutative
   | _ =>
   try
     let _i₁ ← synthInstanceQ q(CommSemiring $R₁)
@@ -126,7 +122,9 @@ def matchRings' {v : Level} (M : Q(Type v)) (iM : Q(AddCommMonoid $M)) (x : Q($M
       Q($x = smulAndSum $((l.map Prod.fst).quote))
         × Σ r : Q($R), Q($r₂ • $x = $r • $x) := do
   match ← isDefEqQ R₁ R₂ with
-  | .defEq (_ : $R₁ =Q $R₂) => pure ⟨R₁, iR₁, iRM₁, l, pf, r₂, q(sorry)⟩
+  -- this case is handled separately, so as not to require commutativity if `R₁ = R₂`
+  | .defEq (_ : $R₁ =Q $R₂) => pure ⟨R₁, iR₁, iRM₁, l, pf, r₂, (q(@rfl _ ($r₂ • $x)):)⟩
+  -- otherwise the "smaller" of the two rings must be commutative
   | _ =>
   try
     let _i₁ ← synthInstanceQ q(CommSemiring $R₁)
@@ -151,6 +149,11 @@ def liftRing {v : Level} (M : Q(Type v)) (iM : Q(AddCommMonoid $M)) (x₁ : Q($M
     (R₂ : Q(Type)) (iR₂ : Q(Semiring $R₂)) (iRM₂ : Q(@Module $R₂ $M $iR₂ $iM)) :
     MetaM <| Σ R : Q(Type), Σ iR : Q(Semiring $R), Σ _ : Q(@Module $R $M $iR $iM),
       Σ l₁ : List (Q($R × $M) × ℕ), Q($x₁ = smulAndSum $((l₁.map Prod.fst).quote)) := do
+  match ← isDefEqQ R₁ R₂ with
+  -- this case is handled separately, so as not to require commutativity if `R₁ = R₂`
+  | .defEq (_ : $R₁ =Q $R₂) => pure ⟨R₁, iR₁, iRM₁, l₁, pf₁⟩
+  -- otherwise the "smaller" of the two rings must be commutative
+  | _ =>
   try
     let _i₁ : Q(CommSemiring $R₂) ← synthInstanceQ q(CommSemiring $R₂)
     let _i₃ ← synthInstanceQ q(Algebra $R₂ $R₁)

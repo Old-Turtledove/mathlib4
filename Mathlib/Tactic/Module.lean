@@ -17,6 +17,14 @@ open Meta Elab Qq Mathlib.Tactic
 abbrev smulAndSum {R : Type*} {M : Type*} [SMul R M] [Add M] [Zero M] (l : List (R × M)) : M :=
   (l.map (fun (⟨r, x⟩ : R × M) ↦ r • x)).sum
 
+@[simp] theorem smulAndSum_cons {R : Type*} {M : Type*} [SMul R M] [AddMonoid M] (p : R × M)
+    (l : List (R × M)) :
+    smulAndSum (p :: l) = p.1 • p.2 + smulAndSum l := by
+  unfold smulAndSum
+  dsimp only
+  rw [List.map_cons]
+  rw [List.sum_cons]
+
 abbrev List.onFst {α β γ : Type*} (l : List (α × β)) (f : α → γ) : List (γ × β) :=
   l.map (fun p ↦ ⟨f p.1, p.2⟩)
 
@@ -156,6 +164,34 @@ def liftRing {v : Level} (M : Q(Type v)) (iM : Q(AddCommMonoid $M)) (x₁ : Q($M
     let l₁' : List (Q($R₂ × $M) × ℕ) := l₁.onFst (fun p ↦ q(considerFstAs $R₂ $p))
     pure ⟨R₂, iR₂, iMR₂, l₁', q(sorry)⟩
 
+
+theorem smulAndSum_cons_add_cons₁ {R : Type*} {M : Type*} [SMul R M] [AddMonoid M]
+    (a₁ a₂ : R × M) (l₁ l₂ : List (R × M)):
+    smulAndSum (a₁ :: l₁) + smulAndSum (a₂ :: l₂)
+      = a₁.1 • a₁.2 + (smulAndSum l₁ + smulAndSum (a₂ :: l₂)) := by
+  rw [smulAndSum_cons]
+  rw [add_assoc]
+
+theorem smulAndSum_cons_add_cons₂ {R : Type*} {M : Type*} [SMul R M] [AddCommMonoid M]
+    (a₁ a₂ : R × M) (l₁ l₂ : List (R × M)):
+    smulAndSum (a₁ :: l₁) + smulAndSum (a₂ :: l₂)
+      = (a₁.1 • a₁.2 + a₂.1 • a₂.2) + (smulAndSum l₁ + smulAndSum l₂) := by
+  simp [smulAndSum_cons, add_assoc]
+  congr! 1
+  simp [← add_assoc]
+  congr! 1
+  rw [add_comm]
+
+theorem smulAndSum_cons_add_cons₃ {R : Type*} {M : Type*} [SMul R M] [AddCommMonoid M]
+    (a₁ a₂ : R × M) (l₁ l₂ : List (R × M)) :
+    smulAndSum (a₁ :: l₁) + smulAndSum (a₂ :: l₂)
+      = a₂.1 • a₂.2 + (smulAndSum (a₁ :: l₁) + smulAndSum l₂) := by
+  simp [smulAndSum_cons, ← add_assoc]
+  congr! 1
+  simp only [add_comm _ (smulAndSum _), add_assoc]
+  congr! 1
+  rw [add_comm]
+
 theorem neg_eq_smulAndSum {M : Type*} [AddCommGroup M] {R : Type*} [Ring R] [Module R M]
     {l : List (R × M)} {x : M} (h : x = smulAndSum l) :
     - x = smulAndSum (l.onFst Neg.neg) := by
@@ -173,6 +209,47 @@ theorem smul_eq_smulAndSum {M : Type*} [AddCommMonoid M] {R : Type*} [Semiring R
   congr
   ext p
   simp [mul_smul]
+
+def asdf {v : Level} {M : Q(Type v)} {R : Q(Type)} {iR : Q(Semiring $R)} {iM : Q(AddCommMonoid $M)}
+    (iRM : Q(Module $R $M)) (l₁ l₂ : List (Q($R × $M) × ℕ)) :
+    Q(smulAndSum $((l₁.map Prod.fst).quote) + smulAndSum $((l₂.map Prod.fst).quote)
+      = smulAndSum $(((combine (cob iR) id id l₁ l₂).map Prod.fst).quote)) :=
+  match l₁, l₂ with
+  | [], l => q(sorry)
+  | a :: l, [] => q(sorry)
+  | (a₁, k₁) :: t₁, (a₂, k₂) :: t₂ =>
+    let z₁ : Q(List ($R × $M)) := (t₁.map Prod.fst).quote
+    let z₂ : Q(List ($R × $M)) := (t₂.map Prod.fst).quote
+    let l₁ : Q(List ($R × $M)) :=
+      List.quote (a₁ :: (combine (cob iR) id id t₁ ((a₂, k₂) :: t₂)).map Prod.fst)
+    let l₂ : Q(List ($R × $M)) :=
+      List.quote (cob iR a₁ a₂ :: (combine (cob iR) id id t₁ t₂).map Prod.fst)
+    let l₃ : Q(List ($R × $M)) :=
+      List.quote (a₂ :: (combine (cob iR) id id ((a₁, k₁) :: t₁) t₂).map Prod.fst)
+    let pf₁ : Q($a₁.1 • $a₁.2 + (smulAndSum $z₁ + smulAndSum ($a₂ :: $z₂)) = smulAndSum $l₁) :=
+      q(sorry)
+    let pf₂ : Q(($a₁.1 • $a₁.2 + $a₂.1 • $a₂.2) + (smulAndSum $z₁ + smulAndSum $z₂)
+      = smulAndSum $l₂) := q(sorry)
+    let pf₃ : Q($a₂.1 • $a₂.2 + (smulAndSum ($a₁ :: $z₁) + smulAndSum $z₂) = smulAndSum $l₃) :=
+      q(sorry)
+    let l' : Q(List ($R × $M)) := if k₁ < k₂ then l₁ else if k₁ = k₂ then l₂ else l₃
+    let pf_lhs : Q((smulAndSum ($a₁ :: $z₁)) + (smulAndSum ($a₂ :: $z₂)) = smulAndSum $l') :=
+      if k₁ < k₂ then
+        (q(Eq.trans (smulAndSum_cons_add_cons₁ _ _ _ _) $pf₁) : Expr)
+      else if k₁ = k₂ then
+        (q(Eq.trans (smulAndSum_cons_add_cons₂ _ _ _ _) $pf₂) : Expr)
+      else
+        (q(Eq.trans (smulAndSum_cons_add_cons₃ _ _ _ _) $pf₃) : Expr)
+    let l : Q(List ($R × $M)) := List.quote <| List.map Prod.fst <|
+      if k₁ < k₂ then
+        (a₁, k₁) :: combine (cob iR) id id t₁ ((a₂, k₂) :: t₂)
+      else if k₁ = k₂ then
+        (cob iR a₁ a₂, k₁) :: combine (cob iR) id id t₁ t₂
+      else
+        (a₂, k₂) :: combine (cob iR) id id ((a₁, k₁) :: t₁) t₂
+    let pf_rhs' : Q($l' = $l) := q(sorry) -- juggle `apply_ite`
+    let pf_rhs : Q(smulAndSum $l' = smulAndSum $l) := q(congrArg _ $pf_rhs')
+    (q(Eq.trans $pf_lhs $pf_rhs):)
 
 /-- The main algorithm behind the `match_scalars` and `module` tactics: partially-normalizing an
 expression in an additive commutative monoid `M` into the form c1 • x1 + c2 • x2 + ... c_k • x_k,
@@ -198,9 +275,8 @@ partial def parse {v : Level} (M : Q(Type v)) (iM : Q(AddCommMonoid $M)) (x : Q(
       ← matchRings M iM x₁ x₂ iMR₁ l₁' pf₁' iMR₂ l₂' pf₂'
     -- build the new list and proof
     let l := combine (cob iR) id id l₁ l₂
-    let pf : Q(smulAndSum $((l₁.map Prod.fst).quote) + smulAndSum $((l₂.map Prod.fst).quote)
-      = smulAndSum $((l.map Prod.fst).quote)) := q(sorry)
-    pure ⟨R, iR, iMR, l, q(Eq.trans (congrArg₂ (· + ·) $pf₁ $pf₂) $pf)⟩
+    let pf := asdf iMR l₁ l₂
+    pure ⟨R, iR, iMR, l, (q(Eq.trans (congrArg₂ (· + ·) $pf₁ $pf₂) $pf):)⟩
   -- parse a subtraction: `x₁ - x₂`
   | ~q(@HSub.hSub _ _ _ (@instHSub _ $iM') $x₁ $x₂) =>
     let ⟨R₁, iR₁, iMR₁, l₁, pf₁⟩ ← parse M iM x₁

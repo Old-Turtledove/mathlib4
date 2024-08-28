@@ -7,6 +7,7 @@ import Mathlib.Data.Finset.Pi
 import Mathlib.Data.Finset.Prod
 import Mathlib.Data.Fintype.Basic
 import Mathlib.Logic.Equiv.Fin
+
 /-!
 # Fintype instances for pi types
 -/
@@ -262,4 +263,3 @@ lemma card_insertNthEquiv_filter_piFinset (P : (∀ i, α (p.succAbove i)) → P
   rw [← card_product, ← map_insertNthEquiv_filter_piFinset, card_map]
 
 end Finset
-#min_imports

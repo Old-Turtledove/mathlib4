@@ -3,7 +3,7 @@ Copyright (c) 2024 Heather Macbeth. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Heather Macbeth
 -/
-import Mathlib.Algebra.Algebra.Basic
+import Mathlib.Algebra.Algebra.Tower
 import Mathlib.GroupTheory.GroupAction.BigOperators
 import Mathlib.Tactic.Ring
 import Mathlib.Util.AtomM
@@ -133,14 +133,19 @@ def matchRings' {v : Level} (M : Q(Type v)) (iM : Q(AddCommMonoid $M)) (x : Q($M
     assumeInstancesCommute
     let l' : List (Q($R₂ × $M) × ℕ) := l.onFst (fun p ↦ q(considerFstAs $R₂ $p))
     let pf' : Q($r₂ • $x = $r₂ • $x) := q(rfl)
-    pure ⟨R₂, iR₂, iRM₂, l', q(sorry), r₂, pf'⟩
+    let L : List Q($R₁ × $M) := l.map Prod.fst
+    let L' : List Q($R₂ × $M) := L.map (fun p ↦ q(considerFstAs $R₂ $p))
+    let pf'' : Q(smulAndSum $(L.quote) = smulAndSum $(L'.quote)) := q(sorry)
+    let pf''' : Q(smulAndSum $((l.map Prod.fst).quote) = smulAndSum $((l'.map Prod.fst).quote)) :=
+      pf''
+    pure ⟨R₂, iR₂, iRM₂, l', q(Eq.trans $pf $pf'''), r₂, pf'⟩
   catch _ =>
     let _i₁ ← synthInstanceQ q(CommSemiring $R₂)
     let _i₃ ← synthInstanceQ q(Algebra $R₂ $R₁)
     let _i₄ ← synthInstanceQ q(IsScalarTower $R₂ $R₁ $M)
     assumeInstancesCommute
     let r : Q($R₁) := q(algebraMap $R₂ $R₁ $r₂)
-    let pf' : Q($r₂ • $x = $r • $x) := q(sorry)
+    let pf' : Q($r₂ • $x = $r • $x) := q(Eq.symm (IsScalarTower.algebraMap_smul $R₁ $r₂ $x))
     pure ⟨R₁, iR₁, iRM₁, l, pf, r, pf'⟩
 
 def liftRing {v : Level} (M : Q(Type v)) (iM : Q(AddCommMonoid $M)) (x₁ : Q($M))

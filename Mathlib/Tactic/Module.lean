@@ -48,17 +48,17 @@ theorem eq_smulAndSum_considerFstAs {S : Type*} (R : Type*) {M : Type*} [CommSem
     x = smulAndSum (l.map (considerFstAs R)) := by
   rw [smulAndSum_considerFstAs, h]
 
-abbrev combine {α : Type*} (f : α → α → α) (fL : α → α) (fR : α → α) :
+abbrev combine {α : Type*} (f : α → α → α) (fR : α → α) :
     List (α × ℕ) → List (α × ℕ) → List (α × ℕ)
   | [], l => l.onFst fR
-  | l@(_ :: _), [] => l.onFst fL
+  | l@(_ :: _), [] => l
   | (a₁, k₁) :: t₁, (a₂, k₂) :: t₂ =>
     if k₁ < k₂ then
-      (fL a₁, k₁) :: combine f fL fR t₁ ((a₂, k₂) :: t₂)
+      (a₁, k₁) :: combine f fR t₁ ((a₂, k₂) :: t₂)
     else if k₁ = k₂ then
-      (f a₁ a₂, k₁) :: combine f fL fR t₁ t₂
+      (f a₁ a₂, k₁) :: combine f fR t₁ t₂
     else
-      (fR a₂, k₂) :: combine f fL fR ((a₁, k₁) :: t₁) t₂
+      (fR a₂, k₂) :: combine f fR ((a₁, k₁) :: t₁) t₂
 
 abbrev cob' {M : Type*} {R : Type} [Semiring R] (p₁ p₂ : R × M) : R × M :=
   let r₁ := Prod.fst p₁
@@ -267,7 +267,7 @@ def ugh {v : Level} {α : Q(Type v)} {a₁ a₂ : Q($α)} (h : a₁ = a₂) : Q(
 def mkSmulAndSum_add {v : Level} {M : Q(Type v)} {R : Q(Type)} {iR : Q(Semiring $R)}
     {iM : Q(AddCommMonoid $M)} (iRM : Q(Module $R $M)) (l₁ l₂ : List (Q($R × $M) × ℕ)) :
     Q(smulAndSum $((l₁.map Prod.fst).quote) + smulAndSum $((l₂.map Prod.fst).quote)
-      = smulAndSum $(((combine (cob iR) id id l₁ l₂).map Prod.fst).quote)) :=
+      = smulAndSum $(((combine (cob iR) id l₁ l₂).map Prod.fst).quote)) :=
   match l₁, l₂ with
   | [], l => (q(zero_add (smulAndSum $((l.map Prod.fst).quote))):)
   | l@(_ :: _), [] => (q(add_zero (smulAndSum $((l.map Prod.fst).quote))):)
@@ -275,12 +275,12 @@ def mkSmulAndSum_add {v : Level} {M : Q(Type v)} {R : Q(Type)} {iR : Q(Semiring 
     let z₁ : Q(List ($R × $M)) := (t₁.map Prod.fst).quote
     let z₂ : Q(List ($R × $M)) := (t₂.map Prod.fst).quote
     let l₁ : Q(List ($R × $M)) :=
-      List.quote ((combine (cob iR) id id t₁ ((a₂, k₂) :: t₂)).map Prod.fst)
+      List.quote ((combine (cob iR) id t₁ ((a₂, k₂) :: t₂)).map Prod.fst)
     let A : Q($R × $M) := cob iR a₁ a₂
     let l₂ : Q(List ($R × $M)) :=
-      List.quote ((combine (cob iR) id id t₁ t₂).map Prod.fst)
+      List.quote ((combine (cob iR) id t₁ t₂).map Prod.fst)
     let l₃ : Q(List ($R × $M)) :=
-      List.quote ((combine (cob iR) id id ((a₁, k₁) :: t₁) t₂).map Prod.fst)
+      List.quote ((combine (cob iR) id ((a₁, k₁) :: t₁) t₂).map Prod.fst)
     let pf₁ : Q($a₁.1 • $a₁.2 + (smulAndSum $z₁ + smulAndSum ($a₂ :: $z₂))
         = $a₁.1 • $a₁.2 + smulAndSum $l₁) :=
       q(congrArg _ $(mkSmulAndSum_add iRM t₁ ((a₂, k₂) :: t₂)))
@@ -304,9 +304,9 @@ def mkSmulAndSum_add {v : Level} {M : Q(Type v)} {R : Q(Type)} {iR : Q(Semiring 
       else
         (q(Eq.trans (smulAndSum_cons_add_cons₃ _ _ _ _)
           (Eq.trans $pf₃ (Eq.symm (smulAndSum_cons _ _)))) : Expr)
-    let p₁ : List (Q($R × $M) × ℕ) := (a₁, k₁) :: combine (cob iR) id id t₁ ((a₂, k₂) :: t₂)
-    let p₂ : List (Q($R × $M) × ℕ) := (cob iR a₁ a₂, k₁) :: combine (cob iR) id id t₁ t₂
-    let p₃ : List (Q($R × $M) × ℕ) := (a₂, k₂) :: combine (cob iR) id id ((a₁, k₁) :: t₁) t₂
+    let p₁ : List (Q($R × $M) × ℕ) := (a₁, k₁) :: combine (cob iR) id t₁ ((a₂, k₂) :: t₂)
+    let p₂ : List (Q($R × $M) × ℕ) := (cob iR a₁ a₂, k₁) :: combine (cob iR) id t₁ t₂
+    let p₃ : List (Q($R × $M) × ℕ) := (a₂, k₂) :: combine (cob iR) id ((a₁, k₁) :: t₁) t₂
     let l'' : Q(List ($R × $M)) := List.quote <|
       if k₁ < k₂ then
         List.map Prod.fst <| p₁
@@ -329,7 +329,7 @@ def mkSmulAndSum_add {v : Level} {M : Q(Type v)} {R : Q(Type)} {iR : Q(Semiring 
 def mkSmulAndSum_sub {v : Level} {M : Q(Type v)} {R : Q(Type)} (iR : Q(Ring $R))
     (iM : Q(AddCommGroup $M)) (iRM : Q(Module $R $M)) (l₁ l₂ : List (Q($R × $M) × ℕ)) :
     Q(smulAndSum $((l₁.map Prod.fst).quote) - smulAndSum $((l₂.map Prod.fst).quote)
-      = smulAndSum $(((combine (boc iR) id (bco iR) l₁ l₂).map Prod.fst).quote)) :=
+      = smulAndSum $(((combine (boc iR) (bco iR) l₁ l₂).map Prod.fst).quote)) :=
   match l₁, l₂ with
   | [], l =>
     let L := l.map Prod.fst
@@ -343,13 +343,13 @@ def mkSmulAndSum_sub {v : Level} {M : Q(Type v)} {R : Q(Type)} (iR : Q(Ring $R))
     let z₁ : Q(List ($R × $M)) := (t₁.map Prod.fst).quote
     let z₂ : Q(List ($R × $M)) := (t₂.map Prod.fst).quote
     let l₁ : Q(List ($R × $M)) :=
-      List.quote ((combine (boc iR) id (bco iR) t₁ ((a₂, k₂) :: t₂)).map Prod.fst)
+      List.quote ((combine (boc iR) (bco iR) t₁ ((a₂, k₂) :: t₂)).map Prod.fst)
     let A : Q($R × $M) := boc iR a₁ a₂
     let B : Q($R × $M) := bco iR a₂
     let l₂ : Q(List ($R × $M)) :=
-      List.quote ((combine (boc iR) id (bco iR) t₁ t₂).map Prod.fst)
+      List.quote ((combine (boc iR) (bco iR) t₁ t₂).map Prod.fst)
     let l₃ : Q(List ($R × $M)) :=
-      List.quote ((combine (boc iR) id (bco iR) ((a₁, k₁) :: t₁) t₂).map Prod.fst)
+      List.quote ((combine (boc iR) (bco iR) ((a₁, k₁) :: t₁) t₂).map Prod.fst)
     let pf₁ : Q($a₁.1 • $a₁.2 + (smulAndSum $z₁ - smulAndSum ($a₂ :: $z₂))
         = $a₁.1 • $a₁.2 + smulAndSum $l₁) :=
       q(congrArg _ $(mkSmulAndSum_sub iR iM iRM t₁ ((a₂, k₂) :: t₂)))
@@ -362,9 +362,9 @@ def mkSmulAndSum_sub {v : Level} {M : Q(Type v)} {R : Q(Type)} (iR : Q(Ring $R))
     let pf₃ : Q(-($a₂.1 • $a₂.2) + (smulAndSum ($a₁ :: $z₁) - smulAndSum $z₂)
         = $B.1 • $B.2 +  smulAndSum $l₃) :=
       q(congrArg₂ (· + ·) $pf₃' $(mkSmulAndSum_sub iR iM iRM ((a₁, k₁) :: t₁) t₂))
-    let x₁ : Q(List ($R × $M)) := q(List.cons ($a₁) $l₁)
-    let x₂ : Q(List ($R × $M)) := q(List.cons ($A) $l₂)
-    let x₃ : Q(List ($R × $M)) := q(List.cons ($B) $l₃)
+    let x₁ : Q(List ($R × $M)) := q($a₁ :: $l₁)
+    let x₂ : Q(List ($R × $M)) := q($A :: $l₂)
+    let x₃ : Q(List ($R × $M)) := q($B :: $l₃)
     let l' : Q(List ($R × $M)) := if k₁ < k₂ then x₁ else if k₁ = k₂ then x₂ else x₃
     let pf_lhs : Q((smulAndSum ($a₁ :: $z₁)) - (smulAndSum ($a₂ :: $z₂)) = smulAndSum $l') :=
       if k₁ < k₂ then
@@ -376,24 +376,14 @@ def mkSmulAndSum_sub {v : Level} {M : Q(Type v)} {R : Q(Type)} (iR : Q(Ring $R))
       else
         (q(Eq.trans (smulAndSum_cons_sub_cons₃ _ _ _ _)
           (Eq.trans $pf₃ (Eq.symm (smulAndSum_cons _ _)))) : Expr)
-    let p₁ : List (Q($R × $M) × ℕ) := (a₁, k₁) :: combine (boc iR) id (bco iR) t₁ ((a₂, k₂) :: t₂)
-    let p₂ : List (Q($R × $M) × ℕ) := (boc iR a₁ a₂, k₁) :: combine (boc iR) id (bco iR) t₁ t₂
+    let p₁ : List (Q($R × $M) × ℕ) := (a₁, k₁) :: combine (boc iR) (bco iR) t₁ ((a₂, k₂) :: t₂)
+    let p₂ : List (Q($R × $M) × ℕ) := (boc iR a₁ a₂, k₁) :: combine (boc iR) (bco iR) t₁ t₂
     let p₃ : List (Q($R × $M) × ℕ) :=
-      (bco iR a₂, k₂) :: combine (boc iR) id (bco iR) ((a₁, k₁) :: t₁) t₂
+      (bco iR a₂, k₂) :: combine (boc iR) (bco iR) ((a₁, k₁) :: t₁) t₂
     let l'' : Q(List ($R × $M)) := List.quote <|
-      if k₁ < k₂ then
-        List.map Prod.fst <| p₁
-      else if k₁ = k₂ then
-        List.map Prod.fst <| p₂
-      else
-        List.map Prod.fst <| p₃
+      if k₁ < k₂ then p₁.map Prod.fst else if k₁ = k₂ then p₂.map Prod.fst else p₃.map Prod.fst
     let l : Q(List ($R × $M)) := List.quote <| List.map Prod.fst <|
-      if k₁ < k₂ then
-        p₁
-      else if k₁ = k₂ then
-        p₂
-      else
-        p₃
+      if k₁ < k₂ then p₁ else if k₁ = k₂ then p₂ else p₃
     have e : l'' = l := congrArg List.quote (askaf k₁ k₂ p₁ p₂ p₃)
     let noooo : Q($l'' = $l) := ugh e -- juggle `apply_ite`
     let pf_rhs : Q(smulAndSum $l' = smulAndSum $l) := (q(congrArg smulAndSum $noooo):)
@@ -424,7 +414,7 @@ partial def parse {v : Level} (M : Q(Type v)) (iM : Q(AddCommMonoid $M)) (x : Q(
       (pf₂ : Q($x₂ = smulAndSum $((l₂.map Prod.fst).quote)))⟩
       ← matchRings M iM x₁ x₂ iRM₁ l₁' pf₁' iRM₂ l₂' pf₂'
     -- build the new list and proof
-    let l := combine (cob iR) id id l₁ l₂
+    let l := combine (cob iR) id l₁ l₂
     let pf := mkSmulAndSum_add iRM l₁ l₂
     pure ⟨R, iR, iRM, l, (q(Eq.trans (congrArg₂ (· + ·) $pf₁ $pf₂) $pf):)⟩
   -- parse a subtraction: `x₁ - x₂`
@@ -438,7 +428,7 @@ partial def parse {v : Level} (M : Q(Type v)) (iM : Q(AddCommMonoid $M)) (x : Q(
     let ⟨R, iR, iRM, l₁'', l₂'', pf₁'', pf₂''⟩ ← matchRings M iM x₁ x₂ iRM₁' l₁' pf₁' iRM₂' l₂' pf₂'
     let iR' ← synthInstanceQ q(Ring $R)
     -- build the new list and proof
-    let l := combine (boc iR') id (bco iR') l₁'' l₂''
+    let l := combine (boc iR') (bco iR') l₁'' l₂''
     let iM' ← synthInstanceQ q(AddCommGroup $M)
     let pf : Q(smulAndSum $((l₁''.map Prod.fst).quote) - smulAndSum $((l₂''.map Prod.fst).quote)
       = smulAndSum $((l.map Prod.fst).quote)) := mkSmulAndSum_sub iR' iM' iRM l₁'' l₂''

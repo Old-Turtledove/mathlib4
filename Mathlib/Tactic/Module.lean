@@ -5,7 +5,6 @@ Authors: Heather Macbeth
 -/
 import Mathlib.Algebra.Algebra.Tower
 import Mathlib.GroupTheory.GroupAction.BigOperators
-import Mathlib.Tactic.Abel
 import Mathlib.Tactic.Ring
 import Mathlib.Util.AtomM
 
@@ -70,9 +69,9 @@ theorem List.smulAndSum_cons_add_cons₂ {R : Type*} {M : Type*} [SMul R M] [Add
     (a₁ a₂ : R × M) (l₁ l₂ : List (R × M)):
     (a₁ :: l₁).smulAndSum + (a₂ :: l₂).smulAndSum
       = (a₁.1 • a₁.2 + a₂.1 • a₂.2) + (l₁.smulAndSum + l₂.smulAndSum) := by
-  simp [smulAndSum_cons, add_assoc]
+  simp only [smulAndSum_cons, add_assoc]
   congr! 1
-  simp [← add_assoc]
+  simp only [← add_assoc]
   congr! 1
   rw [add_comm]
 
@@ -80,14 +79,17 @@ theorem List.smulAndSum_cons_sub_cons₂ {R : Type*} {M : Type*} [SMul R M] [Add
     (a₁ a₂ : R × M) (l₁ l₂ : List (R × M)):
     (a₁ :: l₁).smulAndSum - (a₂ :: l₂).smulAndSum
       = (a₁.1 • a₁.2 - a₂.1 • a₂.2) + (l₁.smulAndSum - l₂.smulAndSum) := by
-  simp [smulAndSum_cons]
-  abel
+  simp only [smulAndSum_cons, add_assoc, sub_eq_add_neg]
+  congr! 1
+  simp only  [← add_assoc, neg_add]
+  congr! 1
+  rw [add_comm]
 
 theorem List.smulAndSum_cons_add_cons₃ {R : Type*} {M : Type*} [SMul R M] [AddCommMonoid M]
     (a₁ a₂ : R × M) (l₁ l₂ : List (R × M)) :
     (a₁ :: l₁).smulAndSum + (a₂ :: l₂).smulAndSum
       = a₂.1 • a₂.2 + ((a₁ :: l₁).smulAndSum + l₂.smulAndSum) := by
-  simp [smulAndSum_cons, ← add_assoc]
+  simp only [smulAndSum_cons, ← add_assoc]
   congr! 1
   simp only [add_comm _ (smulAndSum _), add_assoc]
   congr! 1
@@ -97,8 +99,10 @@ theorem List.smulAndSum_cons_sub_cons₃ {R : Type*} {M : Type*} [SMul R M] [Add
     (a₁ a₂ : R × M) (l₁ l₂ : List (R × M)) :
     (a₁ :: l₁).smulAndSum - (a₂ :: l₂).smulAndSum
       = -(a₂.1 • a₂.2) + ((a₁ :: l₁).smulAndSum - l₂.smulAndSum) := by
-  simp [smulAndSum_cons]
-  abel
+  simp only [smulAndSum_cons, sub_eq_add_neg, neg_add, ← add_assoc]
+  congr! 1
+  rw [add_comm]
+  simp only [add_assoc]
 
 theorem List.smulAndSum_neg {M : Type*} [AddCommGroup M] {R : Type*} [Ring R] [Module R M]
     (l : List (R × M)) :
@@ -146,8 +150,8 @@ abbrev considerFstAs {S M : Type*} (R : Type*) [CommSemiring S] [Semiring R] [Al
     (S × M) → (R × M) :=
   fun ⟨s, x⟩ ↦ (algebraMap S R s, x)
 
-theorem List.smulAndSum_considerFstAs {S : Type*} (R : Type*) {M : Type*} [CommSemiring S] [Semiring R]
-    [Algebra S R] [AddMonoid M] [SMul S M] [MulAction R M] [IsScalarTower S R M]
+theorem List.smulAndSum_considerFstAs {S : Type*} (R : Type*) {M : Type*} [CommSemiring S]
+    [Semiring R] [Algebra S R] [AddMonoid M] [SMul S M] [MulAction R M] [IsScalarTower S R M]
     (l : List (S × M)) :
     (l.map (considerFstAs R)).smulAndSum = l.smulAndSum := by
   simp only [smulAndSum, List.map_map]

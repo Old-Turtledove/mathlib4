@@ -1131,9 +1131,9 @@ of `AddCommMonoid`s, `k ∘ f` is a Localization map for `M` at `S`."]
 def ofMulEquivOfLocalizations (k : N ≃* P) : LocalizationMap S P :=
   (k.toMonoidHom.comp f.toMap).toLocalizationMap (fun y ↦ isUnit_comp f k.toMonoidHom y)
     (fun v ↦
-      let ⟨z, hz⟩ := k.toEquiv.surjective v
+      let ⟨z, hz⟩ := k.surjective v
       let ⟨x, hx⟩ := f.surj z
-      ⟨x, show v * k _ = k _ by rw [← hx, map_mul, ← hz]; rfl⟩)
+      ⟨x, show v * k _ = k _ by rw [← hx, map_mul, ← hz]⟩)
     fun x y ↦ (k.apply_eq_iff_eq.trans f.eq_iff_exists).1
 
 @[to_additive (attr := simp)]
@@ -1203,8 +1203,8 @@ def ofMulEquivOfDom {k : P ≃* M} (H : T.map k.toMonoidHom = S) : LocalizationM
       ⟨z, hz⟩)
     (fun z ↦
       let ⟨x, hx⟩ := f.surj z
-      let ⟨v, hv⟩ := k.toEquiv.surjective x.1
-      let ⟨w, hw⟩ := k.toEquiv.surjective x.2
+      let ⟨v, hv⟩ := k.surjective x.1
+      let ⟨w, hw⟩ := k.surjective x.2
       ⟨(v, ⟨w, H' ▸ show k w ∈ S from hw.symm ▸ x.2.2⟩),
         show z * f.toMap (k.toEquiv w) = f.toMap (k.toEquiv v) by erw [hv, hw, hx]⟩)
     fun x y ↦
@@ -1212,7 +1212,7 @@ def ofMulEquivOfDom {k : P ≃* M} (H : T.map k.toMonoidHom = S) : LocalizationM
       erw [f.eq_iff_exists]
       exact
         fun ⟨c, hc⟩ ↦
-          let ⟨d, hd⟩ := k.toEquiv.surjective c
+          let ⟨d, hd⟩ := k.surjective c
           ⟨⟨d, H' ▸ show k d ∈ S from hd.symm ▸ c.2⟩, by
             erw [← hd, ← map_mul k, ← map_mul k] at hc; exact k.toEquiv.injective hc⟩
 

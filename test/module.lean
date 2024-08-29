@@ -6,6 +6,7 @@ Authors: Heather Macbeth
 import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.LinearCombination
 import Mathlib.Tactic.Module
+import Mathlib.Tactic.NoncommRing
 import Mathlib.Tactic.Positivity
 
 /-! # Tests for the module-normalization tactic -/
@@ -200,6 +201,29 @@ inst✝ : Module K V
 example : 2 • a • x = 2 • x := by module
 
 end CommRing
+
+/-! ### (Noncommutative) ring -/
+
+section Ring
+variable [Ring K] [Module K V]
+
+example : a • x + b • x = (a + b) • x := by
+  match_scalars
+  noncomm_ring
+
+example : 2 • a • x = a • (2:ℤ) • x := by
+  match_scalars
+  noncomm_ring
+
+example (h : a = b) : a • x = b • x := by
+  match_scalars
+  simp [h]
+
+example : (a - b) • a • x + b • b • x = a • a • x + b • (-a + b) • x := by
+  match_scalars
+  noncomm_ring
+
+end Ring
 
 /-! ### Characteristic-zero field -/
 

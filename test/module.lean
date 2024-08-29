@@ -66,6 +66,7 @@ example : x + y + z + (z - x - x) = (-1) • x + y + 2 • z := by module
 example : -x + x = 0 := by module
 example : x - (0 - 0) = x := by module
 example : x + (y - x) = y  := by module
+example : -y + (z - x) = z - y - x := by module
 
 example : x + y = y + x ∧ (↑((1:ℕ) + 1) : ℚ) = 2 := by
   constructor
@@ -84,9 +85,6 @@ example : True := by
 example : y = x + z - (x - y + z) := by
   have : True := trivial
   module
-
--- https://leanprover.zulipchat.com/#narrow/stream/287929-mathlib4/topic/abel.20bug.3F/near/368707560
-example : -y + (z - x) = z - y - x := by module
 
 /--
 error: unsolved goals
@@ -141,10 +139,15 @@ example (h : a ^ 2 + b ^ 2 = 1) : a • (a • x - b • y) + (b • a • y + b
   apply eq_of_add (congr($h • x):)
   module
 
-example (h1 : a • x + b • y = 0) (h2 : a • μ • x + b • ν • y = 0) : (μ - ν) • a • x = 0 := by
-  -- `linear_combination h2 - ν • h1`
-  apply eq_of_add (congr($h2 - ν • $h1):)
-  module
+example (h1 : a • x + b • y = 0) (h2 : a • μ • x + b • ν • y = 0) :
+    (μ - ν) • a • x = 0 ∧ (μ - ν) • b • y = 0 := by
+  constructor
+  · -- `linear_combination h2 - ν • h1`
+    apply eq_of_add (congr($h2 - ν • $h1):)
+    module
+  · -- `linear_combination μ • h1 + h2`
+    apply eq_of_add (congr(μ • $h1 - $h2):)
+    module
 
 example (h1 : 0 • z + a • x + b • y = 0) (h2 : 0 • ρ • z + a • μ • x + b • ν • y = 0) :
     (μ - ν) • a • x = 0 := by
@@ -152,35 +155,22 @@ example (h1 : 0 • z + a • x + b • y = 0) (h2 : 0 • ρ • z + a • μ �
   apply eq_of_add (congr($h2 - ν • $h1):)
   module
 
-example (h1 : a • x + b • y = 0) (h2 : a • μ • x + b • ν • y = 0) :
-    (μ - ν) • b • y = 0 := by
-  -- `linear_combination μ • h1 + h2`
-  apply eq_of_add (congr(μ • $h1 - $h2):)
-  module
-
 example
     (h1 : a • x + b • y + c • z = 0)
     (h2 : a • μ • x + b • ν • y + c • ρ • z = 0)
     (h3 : a • μ • μ • x + b • ν • ν • y + c • ρ • ρ • z = 0) :
-    (μ - ν) • (μ - ρ) • a • x = 0 := by
-  apply eq_of_add (congr($h3 - (ν + ρ) • $h2 + ν • ρ • $h1):)
-  module
-
-example
-    (h1 : a • x + b • y + c • z = 0)
-    (h2 : a • μ • x + b • ν • y + c • ρ • z = 0)
-    (h3 : a • μ • μ • x + b • ν • ν • y + c • ρ • ρ • z = 0) :
-    (μ - ν) • (ν - ρ) • b • y = 0 := by
-  apply eq_of_add (congr(- $h3 + (μ + ρ) • $h2 - μ • ρ • $h1):)
-  module
-
-example
-    (h1 : a • x + b • y + c • z = 0)
-    (h2 : a • μ • x + b • ν • y + c • ρ • z = 0)
-    (h3 : a • μ • μ • x + b • ν • ν • y + c • ρ • ρ • z = 0) :
-    (μ - ρ) • (ν - ρ) • c • z = 0 := by
-  apply eq_of_add (congr($h3 - (μ + ν) • $h2 + μ • ν • $h1):)
-  module
+    (μ - ν) • (μ - ρ) • a • x = 0 ∧ (μ - ν) • (ν - ρ) • b • y = 0
+      ∧ (μ - ρ) • (ν - ρ) • c • z = 0 := by
+  refine ⟨?_, ?_, ?_⟩
+  · -- `linear_combination h3 - (ν + ρ) • h2 + ν • ρ • h1`
+    apply eq_of_add (congr($h3 - (ν + ρ) • $h2 + ν • ρ • $h1):)
+    module
+  · -- `linear_combination - h3 + (μ + ρ) • h2 - μ • ρ • h1`
+    apply eq_of_add (congr(- $h3 + (μ + ρ) • $h2 - μ • ρ • $h1):)
+    module
+  · -- `linear_combination h3 - (μ + ν) • h2 + μ • ν • h1`
+    apply eq_of_add (congr($h3 - (μ + ν) • $h2 + μ • ν • $h1):)
+    module
 
 /--
 error: unsolved goals

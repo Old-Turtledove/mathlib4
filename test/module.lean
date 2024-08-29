@@ -99,7 +99,7 @@ a b c d e f μ ν ρ : K
 inst✝ : AddCommGroup V
 ⊢ -1 + 1 = 0
 -/
--- this is a test to make sure the `push_neg` in `match_scalars` is not doing too much
+-- this is a test to make sure the `push_cast` in `match_scalars` is not doing too much
 #guard_msgs in
 example : -x + x = 0 := by
   match_scalars

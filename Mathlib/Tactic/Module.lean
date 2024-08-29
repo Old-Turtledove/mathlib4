@@ -13,40 +13,155 @@ import Mathlib.Util.AtomM
 -/
 
 open Lean hiding Module
-open Meta Elab Qq Mathlib.Tactic
+open Meta Elab Qq Mathlib.Tactic List
 
-abbrev smulAndSum {R : Type*} {M : Type*} [SMul R M] [Add M] [Zero M] (l : List (R × M)) : M :=
+/-! ### General-purpose definitions and lemmas -/
+
+abbrev List.onFst {α β γ : Type*} (l : List (α × β)) (f : α → γ) : List (γ × β) :=
+  l.map (fun p ↦ ⟨f p.1, p.2⟩)
+
+theorem askaf {α β : Type*} (k₁ k₂ : ℕ) (l₁ l₂ l₃ : List (α × β)) :
+    (if k₁ < k₂ then l₁.map Prod.fst else if k₁ = k₂ then l₂.map Prod.fst else l₃.map Prod.fst)
+    = (if k₁ < k₂ then l₁ else if k₁ = k₂ then l₂ else l₃).map Prod.fst := by
+  split_ifs <;> rfl
+
+def ugh {v : Level} {α : Q(Type v)} {a₁ a₂ : Q($α)} (h : a₁ = a₂) : Q($a₁ = $a₂) := by
+  rw [h]
+  exact q(rfl)
+
+def List.quote {v : Level} {α : Q(Type v)} : List (Q($α)) → Q(List $α)
+  | [] => q([])
+  | e :: t => q($e :: $(t.quote))
+
+/-! ### Constructing the linear combination of a list of pairs (scalar, vector) -/
+
+abbrev List.smulAndSum {R : Type*} {M : Type*} [SMul R M] [Add M] [Zero M] (l : List (R × M)) : M :=
   (l.map (fun (⟨r, x⟩ : R × M) ↦ r • x)).sum
 
-@[simp] theorem smulAndSum_cons {R : Type*} {M : Type*} [SMul R M] [AddMonoid M] (p : R × M)
+@[simp] theorem List.smulAndSum_cons {R : Type*} {M : Type*} [SMul R M] [AddMonoid M] (p : R × M)
     (l : List (R × M)) :
-    smulAndSum (p :: l) = p.1 • p.2 + smulAndSum l := by
+    (p :: l).smulAndSum = p.1 • p.2 + l.smulAndSum := by
   unfold smulAndSum
   dsimp only
   rw [List.map_cons]
   rw [List.sum_cons]
 
-abbrev List.onFst {α β γ : Type*} (l : List (α × β)) (f : α → γ) : List (γ × β) :=
-  l.map (fun p ↦ ⟨f p.1, p.2⟩)
+theorem List.one_pf {M : Type*} [AddMonoid M] (x : M) : x = [((1:ℕ), x)].smulAndSum := by
+  simp [smulAndSum]
+
+theorem List.zero_pf (M : Type*) [AddMonoid M] : (0:M) = [].smulAndSum (R := Nat) := by
+  simp [smulAndSum]
+
+theorem List.smulAndSum_cons_add_cons₁ {R : Type*} {M : Type*} [SMul R M] [AddMonoid M]
+    (a₁ a₂ : R × M) (l₁ l₂ : List (R × M)):
+    (a₁ :: l₁).smulAndSum + (a₂ :: l₂).smulAndSum
+      = a₁.1 • a₁.2 + (l₁.smulAndSum + (a₂ :: l₂).smulAndSum) := by
+  rw [smulAndSum_cons]
+  rw [add_assoc]
+
+theorem List.smulAndSum_cons_sub_cons₁ {R : Type*} {M : Type*} [SMul R M] [AddGroup M]
+    (a₁ a₂ : R × M) (l₁ l₂ : List (R × M)):
+    (a₁ :: l₁).smulAndSum - (a₂ :: l₂).smulAndSum
+      = a₁.1 • a₁.2 + (l₁.smulAndSum - (a₂ :: l₂).smulAndSum) := by
+  rw [smulAndSum_cons]
+  rw [add_sub_assoc]
+
+theorem List.smulAndSum_cons_add_cons₂ {R : Type*} {M : Type*} [SMul R M] [AddCommMonoid M]
+    (a₁ a₂ : R × M) (l₁ l₂ : List (R × M)):
+    (a₁ :: l₁).smulAndSum + (a₂ :: l₂).smulAndSum
+      = (a₁.1 • a₁.2 + a₂.1 • a₂.2) + (l₁.smulAndSum + l₂.smulAndSum) := by
+  simp [smulAndSum_cons, add_assoc]
+  congr! 1
+  simp [← add_assoc]
+  congr! 1
+  rw [add_comm]
+
+theorem List.smulAndSum_cons_sub_cons₂ {R : Type*} {M : Type*} [SMul R M] [AddCommGroup M]
+    (a₁ a₂ : R × M) (l₁ l₂ : List (R × M)):
+    (a₁ :: l₁).smulAndSum - (a₂ :: l₂).smulAndSum
+      = (a₁.1 • a₁.2 - a₂.1 • a₂.2) + (l₁.smulAndSum - l₂.smulAndSum) := by
+  simp [smulAndSum_cons]
+  abel
+
+theorem List.smulAndSum_cons_add_cons₃ {R : Type*} {M : Type*} [SMul R M] [AddCommMonoid M]
+    (a₁ a₂ : R × M) (l₁ l₂ : List (R × M)) :
+    (a₁ :: l₁).smulAndSum + (a₂ :: l₂).smulAndSum
+      = a₂.1 • a₂.2 + ((a₁ :: l₁).smulAndSum + l₂.smulAndSum) := by
+  simp [smulAndSum_cons, ← add_assoc]
+  congr! 1
+  simp only [add_comm _ (smulAndSum _), add_assoc]
+  congr! 1
+  rw [add_comm]
+
+theorem List.smulAndSum_cons_sub_cons₃ {R : Type*} {M : Type*} [SMul R M] [AddCommGroup M]
+    (a₁ a₂ : R × M) (l₁ l₂ : List (R × M)) :
+    (a₁ :: l₁).smulAndSum - (a₂ :: l₂).smulAndSum
+      = -(a₂.1 • a₂.2) + ((a₁ :: l₁).smulAndSum - l₂.smulAndSum) := by
+  simp [smulAndSum_cons]
+  abel
+
+theorem List.smulAndSum_neg {M : Type*} [AddCommGroup M] {R : Type*} [Ring R] [Module R M]
+    (l : List (R × M)) :
+    (l.onFst Neg.neg).smulAndSum = - l.smulAndSum := by
+  simp only [smulAndSum, List.map_map, List.sum_neg]
+  congr
+  ext p
+  simp
+
+theorem List.neg_eq_smulAndSum {M : Type*} [AddCommGroup M] {R : Type*} [Ring R] [Module R M]
+    {l : List (R × M)} {x : M} (h : x = l.smulAndSum) :
+    - x = (l.onFst Neg.neg).smulAndSum := by
+  simpa [smulAndSum_neg]
+
+theorem List.smul_eq_smulAndSum {M : Type*} [AddCommMonoid M] {R : Type*} [Semiring R] [Module R M]
+    {l : List (R × M)} {x : M} (h : x = l.smulAndSum) (r : R) :
+    r • x = (l.onFst (r * ·)).smulAndSum := by
+  unfold smulAndSum at h ⊢
+  simp only [List.map_map, h, List.smul_sum]
+  congr
+  ext p
+  simp [mul_smul]
+
+theorem eq_cons_cons {R : Type*} {M : Type*} [AddMonoid M] [Zero R] [SMul R M] {r₁ r₂ : R} (m : M)
+    {l₁ l₂ : List (R × M)} (h1 : r₁ = r₂) (h2 : l₁.smulAndSum = l₂.smulAndSum) :
+      ((r₁, m) :: l₁).smulAndSum = ((r₂, m) :: l₂).smulAndSum := by
+  simp only [smulAndSum] at *
+  simp [h1, h2]
+
+theorem eq_cons_const {R : Type*} {M : Type*} [AddCommMonoid M] [Semiring R] [Module R M] {r : R}
+    (m : M) {n : M} {l : List (R × M)} (h1 : r = 0) (h2 : l.smulAndSum = n) :
+    ((r, m) :: l).smulAndSum = n := by
+  simp only [smulAndSum] at *
+  simp [h1, h2]
+
+theorem eq_const_cons {R : Type*} {M : Type*} [AddCommMonoid M] [Semiring R] [Module R M] {r : R}
+    (m : M) {n : M} {l : List (R × M)} (h1 : 0 = r) (h2 : n = l.smulAndSum) :
+    n = ((r, m) :: l).smulAndSum := by
+  simp only [smulAndSum] at *
+  simp [← h1, h2]
+
+/-! ### Further algebraic operations -/
 
 abbrev considerFstAs {S M : Type*} (R : Type*) [CommSemiring S] [Semiring R] [Algebra S R] :
     (S × M) → (R × M) :=
   fun ⟨s, x⟩ ↦ (algebraMap S R s, x)
 
-theorem smulAndSum_considerFstAs {S : Type*} (R : Type*) {M : Type*} [CommSemiring S] [Semiring R]
+theorem List.smulAndSum_considerFstAs {S : Type*} (R : Type*) {M : Type*} [CommSemiring S] [Semiring R]
     [Algebra S R] [AddMonoid M] [SMul S M] [MulAction R M] [IsScalarTower S R M]
     (l : List (S × M)) :
-    smulAndSum (l.map (considerFstAs R)) = smulAndSum l := by
+    (l.map (considerFstAs R)).smulAndSum = l.smulAndSum := by
   simp only [smulAndSum, List.map_map]
   congr
   ext
   simp [IsScalarTower.algebraMap_smul]
 
-theorem eq_smulAndSum_considerFstAs {S : Type*} (R : Type*) {M : Type*} [CommSemiring S]
+theorem List.eq_smulAndSum_considerFstAs {S : Type*} (R : Type*) {M : Type*} [CommSemiring S]
     [Semiring R] [Algebra S R] [AddMonoid M] [SMul S M] [MulAction R M] [IsScalarTower S R M]
-    {x : M} {l : List (S × M)} (h : x = smulAndSum l) :
-    x = smulAndSum (l.map (considerFstAs R)) := by
+    {x : M} {l : List (S × M)} (h : x = l.smulAndSum) :
+    x = (l.map (considerFstAs R)).smulAndSum := by
   rw [smulAndSum_considerFstAs, h]
+
+namespace Mathlib.Tactic.MatchScalars
 
 abbrev combine {α : Type*} (f : α → α → α) (fR : α → α) :
     List (α × ℕ) → List (α × ℕ) → List (α × ℕ)
@@ -91,14 +206,7 @@ abbrev bco {v : Level} {M : Q(Type v)} {R : Q(Type)} (_i₂ : Q(Ring $R))
     Q($R × $M) :=
   q(@bco' $M $R $_i₂ $p)
 
-theorem one_pf {M : Type*} [AddMonoid M] (x : M) : x = smulAndSum [((1:ℕ), x)] := by
-  simp [smulAndSum]
-
-theorem zero_pf (M : Type*) [AddMonoid M] : (0:M) = smulAndSum (R := Nat) [] := by simp [smulAndSum]
-
-def List.quote {v : Level} {α : Q(Type v)} : List (Q($α)) → Q(List $α)
-  | [] => q([])
-  | e :: t => q($e :: $(t.quote))
+/-! ### Auxiliary functions for lifting to the "max" of two rings of scalars -/
 
 def matchRings {v : Level} (M : Q(Type v)) (iM : Q(AddCommMonoid $M)) (x₁ x₂ : Q($M))
     {R₁ : Q(Type)} {iR₁ : Q(Semiring $R₁)} (iRM₁ : Q(@Module $R₁ $M $iR₁ $iM))
@@ -183,86 +291,7 @@ def liftRing {v : Level} (M : Q(Type v)) (iM : Q(AddCommMonoid $M)) (x₁ : Q($M
     let l₁' : List (Q($R₂ × $M) × ℕ) := l₁.onFst (fun p ↦ q(considerFstAs $R₂ $p))
     pure ⟨R₂, iR₂, iRM₂, l₁', (q(eq_smulAndSum_considerFstAs $R₂ $pf₁):)⟩
 
-
-theorem smulAndSum_cons_add_cons₁ {R : Type*} {M : Type*} [SMul R M] [AddMonoid M]
-    (a₁ a₂ : R × M) (l₁ l₂ : List (R × M)):
-    smulAndSum (a₁ :: l₁) + smulAndSum (a₂ :: l₂)
-      = a₁.1 • a₁.2 + (smulAndSum l₁ + smulAndSum (a₂ :: l₂)) := by
-  rw [smulAndSum_cons]
-  rw [add_assoc]
-
-theorem smulAndSum_cons_sub_cons₁ {R : Type*} {M : Type*} [SMul R M] [AddGroup M]
-    (a₁ a₂ : R × M) (l₁ l₂ : List (R × M)):
-    smulAndSum (a₁ :: l₁) - smulAndSum (a₂ :: l₂)
-      = a₁.1 • a₁.2 + (smulAndSum l₁ - smulAndSum (a₂ :: l₂)) := by
-  rw [smulAndSum_cons]
-  rw [add_sub_assoc]
-
-theorem smulAndSum_cons_add_cons₂ {R : Type*} {M : Type*} [SMul R M] [AddCommMonoid M]
-    (a₁ a₂ : R × M) (l₁ l₂ : List (R × M)):
-    smulAndSum (a₁ :: l₁) + smulAndSum (a₂ :: l₂)
-      = (a₁.1 • a₁.2 + a₂.1 • a₂.2) + (smulAndSum l₁ + smulAndSum l₂) := by
-  simp [smulAndSum_cons, add_assoc]
-  congr! 1
-  simp [← add_assoc]
-  congr! 1
-  rw [add_comm]
-
-theorem smulAndSum_cons_sub_cons₂ {R : Type*} {M : Type*} [SMul R M] [AddCommGroup M]
-    (a₁ a₂ : R × M) (l₁ l₂ : List (R × M)):
-    smulAndSum (a₁ :: l₁) - smulAndSum (a₂ :: l₂)
-      = (a₁.1 • a₁.2 - a₂.1 • a₂.2) + (smulAndSum l₁ - smulAndSum l₂) := by
-  simp [smulAndSum_cons]
-  abel
-
-theorem smulAndSum_cons_add_cons₃ {R : Type*} {M : Type*} [SMul R M] [AddCommMonoid M]
-    (a₁ a₂ : R × M) (l₁ l₂ : List (R × M)) :
-    smulAndSum (a₁ :: l₁) + smulAndSum (a₂ :: l₂)
-      = a₂.1 • a₂.2 + (smulAndSum (a₁ :: l₁) + smulAndSum l₂) := by
-  simp [smulAndSum_cons, ← add_assoc]
-  congr! 1
-  simp only [add_comm _ (smulAndSum _), add_assoc]
-  congr! 1
-  rw [add_comm]
-
-theorem smulAndSum_cons_sub_cons₃ {R : Type*} {M : Type*} [SMul R M] [AddCommGroup M]
-    (a₁ a₂ : R × M) (l₁ l₂ : List (R × M)) :
-    smulAndSum (a₁ :: l₁) - smulAndSum (a₂ :: l₂)
-      = -(a₂.1 • a₂.2) + (smulAndSum (a₁ :: l₁) - smulAndSum l₂) := by
-  simp [smulAndSum_cons]
-  abel
-
-theorem smulAndSum_neg {M : Type*} [AddCommGroup M] {R : Type*} [Ring R] [Module R M]
-    (l : List (R × M)) :
-    smulAndSum (l.onFst Neg.neg) = - smulAndSum l := by
-  simp only [smulAndSum, List.map_map, List.sum_neg]
-  congr
-  ext p
-  simp
-
-theorem neg_eq_smulAndSum {M : Type*} [AddCommGroup M] {R : Type*} [Ring R] [Module R M]
-    {l : List (R × M)} {x : M} (h : x = smulAndSum l) :
-    - x = smulAndSum (l.onFst Neg.neg) := by
-  simpa [smulAndSum_neg]
-
-theorem smul_eq_smulAndSum {M : Type*} [AddCommMonoid M] {R : Type*} [Semiring R] [Module R M]
-    {l : List (R × M)} {x : M} (h : x = smulAndSum l) (r : R) :
-    r • x = smulAndSum (l.onFst (r * ·)) := by
-  unfold smulAndSum at h ⊢
-  simp only [List.map_map, h, List.smul_sum]
-  congr
-  ext p
-  simp [mul_smul]
-
-
-theorem askaf {α β : Type*} (k₁ k₂ : ℕ) (l₁ l₂ l₃ : List (α × β)) :
-    (if k₁ < k₂ then l₁.map Prod.fst else if k₁ = k₂ then l₂.map Prod.fst else l₃.map Prod.fst)
-    = (if k₁ < k₂ then l₁ else if k₁ = k₂ then l₂ else l₃).map Prod.fst := by
-  split_ifs <;> rfl
-
-def ugh {v : Level} {α : Q(Type v)} {a₁ a₂ : Q($α)} (h : a₁ = a₂) : Q($a₁ = $a₂) := by
-  rw [h]
-  exact q(rfl)
+/-! ### Proof-construction for the addition operation on lists of (scalar, vector) pairs -/
 
 def mkSmulAndSum_add {v : Level} {M : Q(Type v)} {R : Q(Type)} {iR : Q(Semiring $R)}
     {iM : Q(AddCommMonoid $M)} (iRM : Q(Module $R $M)) (l₁ l₂ : List (Q($R × $M) × ℕ)) :
@@ -391,6 +420,8 @@ def mkSmulAndSum_sub {v : Level} {M : Q(Type v)} {R : Q(Type)} (iR : Q(Ring $R))
       q(Eq.trans $pf_lhs $pf_rhs)
     pf
 
+/-! ### Core of the `module` tactic -/
+
 /-- The main algorithm behind the `match_scalars` and `module` tactics: partially-normalizing an
 expression in an additive commutative monoid `M` into the form c1 • x1 + c2 • x2 + ... c_k • x_k,
 where x1, x2, ... are distinct atoms in `M`, and c1, c2, ... are scalars. The scalar type of the
@@ -463,24 +494,6 @@ partial def parse {v : Level} (M : Q(Type v)) (iM : Q(AddCommMonoid $M)) (x : Q(
   | _ =>
     let k : ℕ ← AtomM.addAtom x
     pure ⟨q(Nat), q(Nat.instSemiring), q(AddCommGroup.toNatModule), [(q((1, $x)), k)], q(one_pf $x)⟩
-
-theorem eq_cons_cons {R : Type*} {M : Type*} [AddMonoid M] [Zero R] [SMul R M] {r₁ r₂ : R} (m : M)
-    {l₁ l₂ : List (R × M)} (h1 : r₁ = r₂) (h2 : smulAndSum l₁ = smulAndSum l₂) :
-      smulAndSum ((r₁, m) :: l₁) = smulAndSum ((r₂, m) :: l₂) := by
-  simp only [smulAndSum] at *
-  simp [h1, h2]
-
-theorem eq_cons_const {R : Type*} {M : Type*} [AddCommMonoid M] [Semiring R] [Module R M] {r : R}
-    (m : M) {n : M} {l : List (R × M)} (h1 : r = 0) (h2 : smulAndSum l = n) :
-    smulAndSum ((r, m) :: l) = n := by
-  simp only [smulAndSum] at *
-  simp [h1, h2]
-
-theorem eq_const_cons {R : Type*} {M : Type*} [AddCommMonoid M] [Semiring R] [Module R M] {r : R}
-    (m : M) {n : M} {l : List (R × M)} (h1 : 0 = r) (h2 : n = smulAndSum l) :
-    n = smulAndSum ((r, m) :: l) := by
-  simp only [smulAndSum] at *
-  simp [← h1, h2]
 
 partial def reduceCoefficientwise {v : Level} {R : Q(Type)} {M : Q(Type v)}
     (iM : Q(AddCommMonoid $M)) (iR : Q(Semiring $R)) (iRM : Q(Module $R $M))
@@ -604,3 +617,5 @@ elab "module" : tactic => Tactic.withMainContext <| Tactic.focus do
       ← `(tactic | (push_cast [eq_natCast, eq_intCast, eq_ratCast, -Int.reduceAdd, -Int.reduceNeg,
         -Int.reduceEq, -Nat.reduceAdd]; try ring1))
   Tactic.done
+
+end Mathlib.Tactic.MatchScalars

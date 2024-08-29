@@ -109,6 +109,7 @@ def tensorUnitIso {X : V} (f : 𝟙_ V ≅ X) : 𝟙_ (Action V G) ≅ Action.mk
 
 variable (V G)
 
+set_option maxHeartbeats 400000 in
 /-- When `V` is monoidal the forgetful functor `Action V G` to `V` is monoidal. -/
 @[simps]
 def forgetMonoidal : MonoidalFunctor (Action V G) V :=

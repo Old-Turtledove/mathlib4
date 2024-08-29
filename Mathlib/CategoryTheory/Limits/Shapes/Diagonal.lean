@@ -127,6 +127,7 @@ abbrev pullbackDiagonalMapIso.inv : pullback i₁ i₂ ⟶
         · simp only [condition_assoc, Category.assoc, diagonal_snd, Category.comp_id, limit.lift_π,
             PullbackCone.mk_pt, PullbackCone.mk_π_app, limit.lift_π_assoc, cospan_right])
 
+set_option maxHeartbeats 800000 in
 /-- This iso witnesses the fact that
 given `f : X ⟶ Y`, `i : U ⟶ Y`, and `i₁ : V₁ ⟶ X ×[Y] U`, `i₂ : V₂ ⟶ X ×[Y] U`, the diagram
 

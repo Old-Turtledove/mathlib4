@@ -310,6 +310,7 @@ theorem w₀ {X Y : Augmented C} (f : X ⟶ Y) :
 
 variable (C)
 
+set_option maxHeartbeats 800000 in
 /-- Functor composition induces a functor on augmented simplicial objects. -/
 @[simp]
 def whiskeringObj (D : Type*) [Category D] (F : C ⥤ D) : Augmented C ⥤ Augmented D where
@@ -638,6 +639,7 @@ def toArrow : Augmented C ⥤ Arrow C where
 
 variable (C)
 
+set_option maxHeartbeats 800000 in
 /-- Functor composition induces a functor on augmented cosimplicial objects. -/
 @[simp]
 def whiskeringObj (D : Type*) [Category D] (F : C ⥤ D) : Augmented C ⥤ Augmented D where
@@ -655,6 +657,7 @@ def whiskeringObj (D : Type*) [Category D] (F : C ⥤ D) : Augmented C ⥤ Augme
         erw [← η.w]
         rfl }
 
+set_option maxHeartbeats 400000 in
 /-- Functor composition induces a functor on augmented cosimplicial objects. -/
 @[simps]
 def whiskering (D : Type u') [Category.{v'} D] : (C ⥤ D) ⥤ Augmented C ⥤ Augmented D where

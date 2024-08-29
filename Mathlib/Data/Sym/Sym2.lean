@@ -549,7 +549,10 @@ def sym2EquivSym' : Equiv (Sym2 α) (Sym' α 2) where
         rcases perm_card_two_iff.mp h with (⟨rfl, rfl⟩ | ⟨rfl, rfl⟩)
         · constructor
         apply Sym2.Rel.swap)
-  left_inv := by apply Sym2.ind; aesop (add norm unfold [Sym2.fromVector])
+  left_inv := by
+    apply Sym2.ind
+    set_option aesop.check.script.steps false in
+    aesop
   right_inv x := by
     refine x.recOnSubsingleton fun x => ?_
     cases' x with x hx

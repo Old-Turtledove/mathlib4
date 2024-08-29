@@ -53,6 +53,7 @@ def isLimitOfEval (s : Cone F)
 
 variable [∀ (n : ι), HasLimit (F ⋙ eval C c n)]
 
+set_option maxHeartbeats 800000 in
 /-- A cone for a functor `F : J ⥤ HomologicalComplex C c` which is given in degree `n` by
 the limit `F ⋙ eval C c n`. -/
 @[simps]
@@ -129,6 +130,7 @@ def isColimitOfEval (s : Cocone F)
 
 variable [∀ (n : ι), HasColimit (F ⋙ HomologicalComplex.eval C c n)]
 
+set_option maxHeartbeats 800000 in
 /-- A cocone for a functor `F : J ⥤ HomologicalComplex C c` which is given in degree `n` by
 the colimit of `F ⋙ eval C c n`. -/
 @[simps]

@@ -458,6 +458,7 @@ end Functor
 
 namespace NatTrans
 
+set_option maxHeartbeats 400000 in
 /-- A natural transformation induces a natural transformation between the `map_presheaf` functors.
 -/
 def onPresheaf {F G : C ⥤ D} (α : F ⟶ G) : G.mapPresheaf ⟶ F.mapPresheaf where

@@ -82,6 +82,7 @@ namespace KaroubiFunctorCategoryEmbedding
 
 variable {J C}
 
+set_option maxHeartbeats 400000 in
 /-- On objects, the functor which sends a formal direct factor `P` of a
 functor `F : J ⥤ C` to the functor `J ⥤ Karoubi C` which sends `(j : J)` to
 the corresponding direct factor of `F.obj j`. -/

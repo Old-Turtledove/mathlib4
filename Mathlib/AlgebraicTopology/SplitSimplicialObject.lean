@@ -335,6 +335,7 @@ attribute [simp, reassoc] Hom.comm
 
 end Split
 
+set_option maxHeartbeats 400000 in
 instance : Category (Split C) where
   Hom := Split.Hom
   id S :=

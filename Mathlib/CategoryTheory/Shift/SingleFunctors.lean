@@ -220,6 +220,7 @@ def postcomp (G : D ⥤ E) [G.CommShift A] :
 
 variable (C A)
 
+set_option maxHeartbeats 400000 in
 /-- The functor `SingleFunctors C D A ⥤ SingleFunctors C E A` given by the postcomposition
 by a functor `G : D ⥤ E` which commutes with the shift. -/
 def postcompFunctor (G : D ⥤ E) [G.CommShift A] :

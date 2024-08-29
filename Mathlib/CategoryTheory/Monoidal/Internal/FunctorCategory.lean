@@ -96,6 +96,7 @@ def unitIso : 𝟭 (Mon_ (C ⥤ D)) ≅ functor ⋙ inverse :=
   { hom := { hom := { app := fun _ => 𝟙 _ } }
     inv := { hom := { app := fun _ => 𝟙 _ } } })
 
+set_option maxHeartbeats 400000 in
 /-- The counit for the equivalence `Mon_ (C ⥤ D) ≌ C ⥤ Mon_ D`.
 -/
 @[simps!]
@@ -182,6 +183,7 @@ private def unitIso : 𝟭 (Comon_ (C ⥤ D)) ≅ functor ⋙ inverse :=
   { hom := { hom := { app := fun _ => 𝟙 _ } }
     inv := { hom := { app := fun _ => 𝟙 _ } } })
 
+set_option maxHeartbeats 400000 in
 /-- The counit for the equivalence `Mon_ (C ⥤ D) ≌ C ⥤ Mon_ D`.
 -/
 @[simps!]
@@ -240,6 +242,7 @@ def unitIso : 𝟭 (CommMon_ (C ⥤ D)) ≅ functor ⋙ inverse :=
   { hom := { hom := { app := fun _ => 𝟙 _ }  }
     inv := { hom := { app := fun _ => 𝟙 _ }  } })
 
+set_option maxHeartbeats 800000 in
 /-- The counit for the equivalence `CommMon_ (C ⥤ D) ≌ C ⥤ CommMon_ D`.
 -/
 @[simps!]

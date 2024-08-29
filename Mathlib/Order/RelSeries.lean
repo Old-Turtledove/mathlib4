@@ -582,6 +582,8 @@ lemma smash_succ_natAdd {p q : RelSeries r} (h : p.last = q.head) (i : Fin q.len
     ite_eq_left_iff, not_lt, nonpos_iff_eq_zero]
   intro H; convert h.symm; congr; aesop
 
+set_option aesop.dev.dynamicStructuring false in
+set_option aesop.check.script.steps false in
 @[simp] lemma last_smash {p q : RelSeries r} (h : p.last = q.head) :
     (smash p q h).last = q.last := by
   delta smash last; aesop

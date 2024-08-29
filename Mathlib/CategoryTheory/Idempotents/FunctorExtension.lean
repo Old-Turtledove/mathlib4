@@ -39,6 +39,7 @@ theorem natTrans_eq {F G : Karoubi C ⥤ D} (φ : F ⟶ G) (P : Karoubi C) :
 
 namespace FunctorExtension₁
 
+set_option maxHeartbeats 400000 in
 /-- The canonical extension of a functor `C ⥤ Karoubi D` to a functor
 `Karoubi C ⥤ Karoubi D` -/
 @[simps]
@@ -93,6 +94,7 @@ def functorExtension₁ : (C ⥤ Karoubi D) ⥤ Karoubi C ⥤ Karoubi D where
     slice_rhs 1 2 => rw [h']
     simp only [assoc]
 
+set_option maxHeartbeats 800000 in
 /-- The natural isomorphism expressing that functors `Karoubi C ⥤ Karoubi D` obtained
 using `functorExtension₁` actually extends the original functors `C ⥤ Karoubi D`. -/
 @[simps!]
@@ -174,6 +176,7 @@ def functorExtension₁Comp (F : C ⥤ Karoubi D) (G : D ⥤ Karoubi E) :
 def functorExtension₂ : (C ⥤ D) ⥤ Karoubi C ⥤ Karoubi D :=
   (whiskeringRight C D (Karoubi D)).obj (toKaroubi D) ⋙ functorExtension₁ C D
 
+set_option maxHeartbeats 6400000 in
 /-- The natural isomorphism expressing that functors `Karoubi C ⥤ Karoubi D` obtained
 using `functorExtension₂` actually extends the original functors `C ⥤ D`. -/
 @[simps!]

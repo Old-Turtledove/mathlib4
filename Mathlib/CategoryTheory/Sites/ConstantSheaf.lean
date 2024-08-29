@@ -21,6 +21,7 @@ open Limits Opposite Category Functor Sheaf
 variable {C : Type*} [Category C] (J : GrothendieckTopology C)
 variable (D : Type*) [Category D]
 
+set_option maxHeartbeats 400000 in
 /-- The constant presheaf functor is left adjoint to evaluation at a terminal object. -/
 noncomputable def constantPresheafAdj {T : C} (hT : IsTerminal T) :
     Functor.const Cᵒᵖ ⊣ (evaluation Cᵒᵖ D).obj (op T) :=

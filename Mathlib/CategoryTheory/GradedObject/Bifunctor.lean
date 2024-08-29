@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joël Riou
 -/
 import Mathlib.CategoryTheory.GradedObject
+
 /-!
 # The action of bifunctors on graded objects
 
@@ -28,6 +29,7 @@ variable {C₁ C₂ C₃ : Type*} [Category C₁] [Category C₂] [Category C₃
 
 namespace GradedObject
 
+set_option maxHeartbeats 1600000 in
 /-- Given a bifunctor `F : C₁ ⥤ C₂ ⥤ C₃` and types `I` and `J`, this is the obvious
 functor `GradedObject I C₁ ⥤ GradedObject J C₂ ⥤ GradedObject (I × J) C₃`. -/
 @[simps]
@@ -132,6 +134,7 @@ end
 
 attribute [local simp] mapBifunctorMapMap
 
+set_option maxHeartbeats 12800000 in
 /-- Given a bifunctor `F : C₁ ⥤ C₂ ⥤ C₃` and a map `p : I × J → K`, this is the
 functor `GradedObject I C₁ ⥤ GradedObject J C₂ ⥤ GradedObject K C₃` sending
 `X : GradedObject I C₁` and `Y : GradedObject J C₂` to the `K`-graded object sending

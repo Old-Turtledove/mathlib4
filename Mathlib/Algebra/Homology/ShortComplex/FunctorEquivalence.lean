@@ -26,6 +26,7 @@ namespace FunctorEquivalence
 
 attribute [local simp] ShortComplex.Hom.comm₁₂ ShortComplex.Hom.comm₂₃
 
+set_option maxHeartbeats 3200000 in
 /-- The obvious functor `ShortComplex (J ⥤ C) ⥤ J ⥤ ShortComplex C`. -/
 @[simps]
 def functor : ShortComplex (J ⥤ C) ⥤ J ⥤ ShortComplex C where
@@ -35,6 +36,7 @@ def functor : ShortComplex (J ⥤ C) ⥤ J ⥤ ShortComplex C where
   map φ :=
     { app := fun j => ((evaluation J C).obj j).mapShortComplex.map φ }
 
+set_option maxHeartbeats 1600000 in
 /-- The obvious functor `(J ⥤ ShortComplex C) ⥤ ShortComplex (J ⥤ C)`. -/
 @[simps]
 def inverse : (J ⥤ ShortComplex C) ⥤ ShortComplex (J ⥤ C) where
@@ -45,6 +47,7 @@ def inverse : (J ⥤ ShortComplex C) ⥤ ShortComplex (J ⥤ C) where
   map φ := Hom.mk (whiskerRight φ π₁) (whiskerRight φ π₂) (whiskerRight φ π₃)
     (by aesop_cat) (by aesop_cat)
 
+set_option maxHeartbeats 3200000 in
 /-- The unit isomorphism of the equivalence
 `ShortComplex.functorEquivalence : ShortComplex (J ⥤ C) ≌ J ⥤ ShortComplex C`. -/
 @[simps!]
@@ -55,6 +58,7 @@ def unitIso : 𝟭 _ ≅ functor J C ⋙ inverse J C :=
     (NatIso.ofComponents (fun _ => Iso.refl _) (by aesop_cat))
     (by aesop_cat) (by aesop_cat)) (by aesop_cat)
 
+set_option maxHeartbeats 1600000 in
 /-- The counit isomorphism of the equivalence
 `ShortComplex.functorEquivalence : ShortComplex (J ⥤ C) ≌ J ⥤ ShortComplex C`. -/
 @[simps!]

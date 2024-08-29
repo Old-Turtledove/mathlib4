@@ -26,6 +26,7 @@ section
 
 variable (F₁₂ : C₁ ⥤ C₂ ⥤ C₁₂) (G : C₁₂ ⥤ C₃ ⥤ C₄)
 
+set_option maxHeartbeats 800000 in
 /-- Auxiliary definition for `bifunctorComp₁₂`. -/
 @[simps]
 def bifunctorComp₁₂Obj (X₁ : C₁) : C₂ ⥤ C₃ ⥤ C₄ where
@@ -35,6 +36,7 @@ def bifunctorComp₁₂Obj (X₁ : C₁) : C₂ ⥤ C₃ ⥤ C₄ where
   map {X₂ Y₂} φ :=
     { app := fun X₃ => (G.map ((F₁₂.obj X₁).map φ)).app X₃ }
 
+set_option maxHeartbeats 1600000 in
 /-- Given two bifunctors `F₁₂ : C₁ ⥤ C₂ ⥤ C₁₂` and `G : C₁₂ ⥤ C₃ ⥤ C₄`, this is
 the trifunctor `C₁ ⥤ C₂ ⥤ C₃ ⥤ C₄` obtained by composition. -/
 @[simps]
@@ -54,6 +56,7 @@ section
 
 variable (F : C₁ ⥤ C₂₃ ⥤ C₄) (G₂₃ : C₂ ⥤ C₃ ⥤ C₂₃)
 
+set_option maxHeartbeats 3200000 in
 /-- Auxiliary definition for `bifunctorComp₂₃`. -/
 @[simps]
 def bifunctorComp₂₃Obj (X₁ : C₁) : C₂ ⥤ C₃ ⥤ C₄ where
@@ -66,6 +69,7 @@ def bifunctorComp₂₃Obj (X₁ : C₁) : C₂ ⥤ C₃ ⥤ C₄ where
         dsimp
         simp only [← Functor.map_comp, NatTrans.naturality] }
 
+set_option maxHeartbeats 1600000 in
 /-- Given two bifunctors `F : C₁ ⥤ C₂₃ ⥤ C₄` and `G₂₃ : C₂ ⥤ C₃ ⥤ C₄`, this is
 the trifunctor `C₁ ⥤ C₂ ⥤ C₃ ⥤ C₄` obtained by composition. -/
 @[simps]

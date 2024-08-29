@@ -650,6 +650,7 @@ lemma hom_ext₃ {f g : ComposableArrows C 3} {φ φ' : f ⟶ g}
     φ = φ' :=
   hom_ext_succ h₀ (hom_ext₂ h₁ h₂ h₃)
 
+set_option maxHeartbeats 400000 in
 /-- Constructor for isomorphisms in `ComposableArrows C 3`. -/
 @[simps]
 def isoMk₃ {f g : ComposableArrows C 3}
@@ -806,6 +807,7 @@ lemma hom_ext₅ {f g : ComposableArrows C 5} {φ φ' : f ⟶ g}
     φ = φ' :=
   hom_ext_succ h₀ (hom_ext₄ h₁ h₂ h₃ h₄ h₅)
 
+set_option maxHeartbeats 400000 in
 /-- Constructor for isomorphisms in `ComposableArrows C 5`. -/
 @[simps]
 def isoMk₅ {f g : ComposableArrows C 5}

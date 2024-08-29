@@ -213,6 +213,7 @@ namespace Split
 
 variable {C : Type*} [Category C] [Preadditive C] [HasFiniteCoproducts C]
 
+set_option maxHeartbeats 400000 in
 /-- The functor which sends a split simplicial object in a preadditive category to
 the chain complex which consists of nondegenerate simplices. -/
 @[simps]

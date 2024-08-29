@@ -516,6 +516,7 @@ noncomputable def functorL₂' : SnakeInput C ⥤ ShortComplex C where
       comm₁₂ := (naturality_δ f).symm
       comm₂₃ := f.f₃.comm₁₂ }
 
+set_option maxHeartbeats 800000 in
 /-- The functor which maps `S : SnakeInput C` to the diagram
 `S.L₀.X₁ ⟶ S.L₀.X₂ ⟶ S.L₀.X₃ ⟶ S.L₃.X₁ ⟶ S.L₃.X₂ ⟶ S.L₃.X₃`. -/
 @[simps]

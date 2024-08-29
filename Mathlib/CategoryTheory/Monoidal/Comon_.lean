@@ -277,6 +277,7 @@ theorem tensorObj_comul (A B : Comon_ C) :
   dsimp [op_tensorObj, op_associator]
   rw [Category.assoc, Category.assoc, Category.assoc]
 
+set_option maxHeartbeats 800000 in
 /-- The forgetful functor from `Comon_ C` to `C` is monoidal when `C` is braided monoidal. -/
 def forgetMonoidal : MonoidalFunctor (Comon_ C) C :=
   { forget C with

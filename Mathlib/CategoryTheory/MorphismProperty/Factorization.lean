@@ -194,6 +194,7 @@ def functorCategory.Z : Arrow (J ⥤ C) ⥤ J ⥤ C where
     rw [← data.mapZ_comp]
     congr 1
 
+set_option maxHeartbeats 1600000 in
 /-- A functorial factorization in the category `C` extends to the functor category `J ⥤ C`. -/
 def functorCategory :
     FunctorialFactorizationData (W₁.functorCategory J) (W₂.functorCategory J) where

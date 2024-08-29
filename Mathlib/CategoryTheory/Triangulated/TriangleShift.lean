@@ -72,6 +72,7 @@ noncomputable def Triangle.shiftFunctorZero : Triangle.shiftFunctor C 0 ≅ 𝟭
           comp_id, NatTrans.naturality, Functor.id_map]))
     (by aesop_cat)
 
+set_option maxHeartbeats 1600000 in
 /-- The canonical isomorphism
 `Triangle.shiftFunctor C n ≅ Triangle.shiftFunctor C a ⋙ Triangle.shiftFunctor C b`
 when `a + b = n`. -/
@@ -104,6 +105,7 @@ noncomputable def Triangle.shiftFunctorAdd' (a b n : ℤ) (h : a + b = n) :
           shiftFunctorComm_hom_app_comp_shift_shiftFunctorAdd_hom_app, add_comm a]))
     (by aesop_cat)
 
+set_option maxHeartbeats 400000 in
 /-- Rotating triangles three times identifies with the shift by `1`. -/
 noncomputable def rotateRotateRotateIso :
     rotate C ⋙ rotate C ⋙ rotate C ≅ Triangle.shiftFunctor C 1 :=
@@ -112,6 +114,7 @@ noncomputable def rotateRotateRotateIso :
       (by aesop_cat) (by aesop_cat) (by aesop_cat))
     (by aesop_cat)
 
+set_option maxHeartbeats 400000 in
 /-- Rotating triangles three times backwards identifies with the shift by `-1`. -/
 noncomputable def invRotateInvRotateInvRotateIso :
     invRotate C ⋙ invRotate C ⋙ invRotate C ≅ Triangle.shiftFunctor C (-1) :=

@@ -105,6 +105,7 @@ def conesEquivCounitIso (B : C) (F : Discrete J ⥤ Over B) :
     { hom := Over.homMk (𝟙 _)
       inv := Over.homMk (𝟙 _) }
 
+set_option maxHeartbeats 800000 in
 /-- (Impl) Establish an equivalence between the category of cones for `F` and for the "grown" `F`.
 -/
 @[simps]

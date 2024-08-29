@@ -243,6 +243,7 @@ def empty : LocallyRingedSpace.{u} where
 
 instance : EmptyCollection LocallyRingedSpace.{u} := ⟨LocallyRingedSpace.empty⟩
 
+set_option maxHeartbeats 1600000 in
 /-- The canonical map from the empty locally ringed space. -/
 def emptyTo (X : LocallyRingedSpace) : ∅ ⟶ X :=
   ⟨⟨⟨fun x => PEmpty.elim x, by fun_prop⟩,

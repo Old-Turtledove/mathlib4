@@ -29,6 +29,7 @@ universe v₁ u₁ u₂
 -- morphism levels before object levels. See note [CategoryTheory universes].
 variable {C : Type u₁} [Category.{v₁} C]
 
+set_option maxHeartbeats 400000 in
 /-- The Yoneda embedding, as a functor from `C` into presheaves on `C`.
 
 See <https://stacks.math.columbia.edu/tag/001O>.

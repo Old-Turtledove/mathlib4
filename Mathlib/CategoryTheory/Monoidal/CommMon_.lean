@@ -145,6 +145,7 @@ def laxBraidedToCommMon : LaxBraidedFunctor (Discrete PUnit.{u + 1}) C ⥤ CommM
   obj F := (F.mapCommMon : CommMon_ _ ⥤ CommMon_ C).obj (trivial (Discrete PUnit.{u+1}))
   map α := ((mapCommMonFunctor (Discrete PUnit.{u+1}) C).map α).app _
 
+set_option maxHeartbeats 400000 in
 /-- Implementation of `CommMon_.equivLaxBraidedFunctorPunit`. -/
 @[simps]
 def commMonToLaxBraided : CommMon_ C ⥤ LaxBraidedFunctor (Discrete PUnit.{u + 1}) C where
@@ -173,6 +174,7 @@ def unitIso :
           (fun _ => F.toLaxMonoidalFunctor.toFunctor.mapIso (eqToIso (by ext)))
           (by rintro ⟨⟩ ⟨⟩ f; aesop_cat) (by aesop_cat) (by aesop_cat)))
 
+set_option maxHeartbeats 400000 in
 /-- Implementation of `CommMon_.equivLaxBraidedFunctorPUnit`. -/
 @[simps!]
 def counitIso : commMonToLaxBraided C ⋙ laxBraidedToCommMon C ≅ 𝟭 (CommMon_ C) :=

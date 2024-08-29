@@ -45,6 +45,9 @@ namespace CategoryTheory.Arrow
 variable (f : Arrow C)
 variable [∀ n : ℕ, HasWidePullback.{0} f.right (fun _ : Fin (n + 1) => f.left) fun _ => f.hom]
 
+-- Wrong script steps for ext
+set_option aesop.check.script false in
+set_option aesop.check.script.steps false in
 /-- The Čech nerve associated to an arrow. -/
 @[simps]
 def cechNerve : SimplicialObject C where
@@ -52,6 +55,9 @@ def cechNerve : SimplicialObject C where
   map g := WidePullback.lift (WidePullback.base _)
     (fun i => WidePullback.π _ (g.unop.toOrderHom i)) (by aesop_cat)
 
+-- Wrong script steps for ext
+set_option aesop.check.script false in
+set_option aesop.check.script.steps false in
 /-- The morphism between Čech nerves associated to a morphism of arrows. -/
 @[simps]
 def mapCechNerve {f g : Arrow C}
@@ -87,12 +93,18 @@ namespace SimplicialObject
 variable
   [∀ (n : ℕ) (f : Arrow C), HasWidePullback f.right (fun _ : Fin (n + 1) => f.left) fun _ => f.hom]
 
+-- Wrong script steps for ext
+set_option aesop.check.script false in
+set_option aesop.check.script.steps false in
 /-- The Čech nerve construction, as a functor from `Arrow C`. -/
 @[simps]
 def cechNerve : Arrow C ⥤ SimplicialObject C where
   obj f := f.cechNerve
   map F := Arrow.mapCechNerve F
 
+-- Wrong script steps for ext
+set_option aesop.check.script false in
+set_option aesop.check.script.steps false in
 /-- The augmented Čech nerve construction, as a functor from `Arrow C`. -/
 @[simps!]
 def augmentedCechNerve : Arrow C ⥤ SimplicialObject.Augmented C where
@@ -163,6 +175,9 @@ def cechNerveEquiv (X : SimplicialObject.Augmented C) (F : Arrow C) :
       · simpa using congr_app A.w.symm x
     · rfl
 
+-- Wrong script steps for ext
+set_option aesop.check.script false in
+set_option aesop.check.script.steps false in
 /-- The augmented Čech nerve construction is right adjoint to the `toArrow` functor. -/
 abbrev cechNerveAdjunction : (Augmented.toArrow : _ ⥤ Arrow C) ⊣ augmentedCechNerve :=
   Adjunction.mkOfHomEquiv
@@ -186,6 +201,9 @@ namespace CategoryTheory.Arrow
 variable (f : Arrow C)
 variable [∀ n : ℕ, HasWidePushout f.left (fun _ : Fin (n + 1) => f.right) fun _ => f.hom]
 
+-- Wrong script steps for ext
+set_option aesop.check.script false in
+set_option aesop.check.script.steps false in
 /-- The Čech conerve associated to an arrow. -/
 @[simps]
 def cechConerve : CosimplicialObject C where
@@ -195,6 +213,9 @@ def cechConerve : CosimplicialObject C where
       (fun i => (@WidePushout.ι _ _ _ _ _ (fun _ => f.hom) (_) (g.toOrderHom i))) (fun j => ?_)
     erw [← WidePushout.arrow_ι]
 
+-- Wrong script steps for ext
+set_option aesop.check.script false in
+set_option aesop.check.script.steps false in
 /-- The morphism between Čech conerves associated to a morphism of arrows. -/
 @[simps]
 def mapCechConerve {f g : Arrow C}
@@ -231,12 +252,18 @@ namespace CosimplicialObject
 variable
   [∀ (n : ℕ) (f : Arrow C), HasWidePushout f.left (fun _ : Fin (n + 1) => f.right) fun _ => f.hom]
 
+-- Wrong script steps for ext
+set_option aesop.check.script false in
+set_option aesop.check.script.steps false in
 /-- The Čech conerve construction, as a functor from `Arrow C`. -/
 @[simps]
 def cechConerve : Arrow C ⥤ CosimplicialObject C where
   obj f := f.cechConerve
   map F := Arrow.mapCechConerve F
 
+-- Wrong script steps for ext
+set_option aesop.check.script false in
+set_option aesop.check.script.steps false in
 /-- The augmented Čech conerve construction, as a functor from `Arrow C`. -/
 @[simps]
 def augmentedCechConerve : Arrow C ⥤ CosimplicialObject.Augmented C where
@@ -317,6 +344,9 @@ def cechConerveEquiv (F : Arrow C) (X : CosimplicialObject.Augmented C) :
       change 0 = a
       omega
 
+-- Wrong script steps for ext
+set_option aesop.check.script false in
+set_option aesop.check.script.steps false in
 /-- The augmented Čech conerve construction is left adjoint to the `toArrow` functor. -/
 abbrev cechConerveAdjunction : augmentedCechConerve ⊣ (Augmented.toArrow : _ ⥤ Arrow C) :=
   Adjunction.mkOfHomEquiv { homEquiv := cechConerveEquiv }

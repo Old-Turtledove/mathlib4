@@ -126,6 +126,7 @@ theorem id_mem_of_tgt {c d : C} {f : c ⟶ d} (h : f ∈ S.arrows c d) : 𝟙 d 
 def asWideQuiver : Quiver C :=
   ⟨fun c d => Subtype <| S.arrows c d⟩
 
+set_option maxHeartbeats 800000 in
 /-- The coercion of a subgroupoid as a groupoid -/
 @[simps comp_coe, simps (config := .lemmasOnly) inv_coe]
 instance coe : Groupoid S.objs where

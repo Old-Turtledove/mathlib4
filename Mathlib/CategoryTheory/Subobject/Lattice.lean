@@ -119,6 +119,7 @@ section Inf
 
 variable [HasPullbacks C]
 
+set_option maxHeartbeats 400000 in
 /-- When `[HasPullbacks C]`, `MonoOver A` has "intersections", functorial in both arguments.
 
 As `MonoOver A` is only a preorder, this doesn't satisfy the axioms of `SemilatticeInf`,

@@ -181,6 +181,7 @@ theorem normalizeAux_nil_comp {a b c : B} (f : Hom a b) (g : Hom b c) :
   | of => rfl
   | comp g _ ihf ihg => erw [ihg (f.comp g), ihf f, ihg g, comp_assoc]
 
+set_option maxHeartbeats 400000 in
 /-- The normalization pseudofunctor for the free bicategory on a quiver `B`. -/
 def normalize (B : Type u) [Quiver.{v + 1} B] :
     Pseudofunctor (FreeBicategory B) (LocallyDiscrete (Paths B)) where

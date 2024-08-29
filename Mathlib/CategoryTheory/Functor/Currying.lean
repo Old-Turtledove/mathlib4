@@ -22,6 +22,7 @@ universe v₁ v₂ v₃ v₄ v₅ u₁ u₂ u₃ u₄ u₅
 variable {B : Type u₁} [Category.{v₁} B] {C : Type u₂} [Category.{v₂} C] {D : Type u₃}
   [Category.{v₃} D] {E : Type u₄} [Category.{v₄} E] {H : Type u₅} [Category.{v₅} H]
 
+set_option maxHeartbeats 800000 in
 /-- The uncurrying functor, taking a functor `C ⥤ (D ⥤ E)` and producing a functor `(C × D) ⥤ E`.
 -/
 @[simps]

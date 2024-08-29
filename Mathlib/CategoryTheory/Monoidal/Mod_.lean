@@ -89,6 +89,7 @@ def forget : Mod_ A ⥤ C where
 
 open CategoryTheory.MonoidalCategory
 
+set_option maxHeartbeats 1600000 in
 /-- A morphism of monoid objects induces a "restriction" or "comap" functor
 between the categories of module objects.
 -/

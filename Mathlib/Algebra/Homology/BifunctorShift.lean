@@ -61,6 +61,7 @@ variable [Preadditive C₁] [HasZeroMorphisms C₂] [Preadditive D]
   (F : C₁ ⥤ C₂ ⥤ D) [F.Additive] [∀ (X₁ : C₁), (F.obj X₁).PreservesZeroMorphisms] (x : ℤ)
   [HasMapBifunctor K₁ K₂ F]
 
+set_option maxHeartbeats 800000 in
 /-- Auxiliary definition for `mapBifunctorShift₁Iso`. -/
 @[simps! hom_f_f inv_f_f]
 def mapBifunctorHomologicalComplexShift₁Iso :
@@ -88,6 +89,7 @@ variable [HasZeroMorphisms C₁] [Preadditive C₂] [Preadditive D]
   (F : C₁ ⥤ C₂ ⥤ D) [F.PreservesZeroMorphisms] [∀ (X₁ : C₁), (F.obj X₁).Additive] (y : ℤ)
   [HasMapBifunctor K₁ K₂ F]
 
+set_option maxHeartbeats 800000 in
 /-- Auxiliary definition for `mapBifunctorShift₂Iso`. -/
 @[simps! hom_f_f inv_f_f]
 def mapBifunctorHomologicalComplexShift₂Iso :

@@ -90,6 +90,7 @@ def vComp : TwoSquare H₁ (L₁ ⋙ L₂) (R₁ ⋙ R₂) H₃ :=
   (Functor.associator _ _ _).inv ≫ whiskerRight w R₂ ≫
     (Functor.associator _ _ _).hom ≫ whiskerLeft L₁ w' ≫ (Functor.associator _ _ _).inv
 
+set_option maxHeartbeats 400000 in
 /-- The canonical isomorphism between
 `w.structuredArrowDownwards Y₁ ⋙ w'.structuredArrowDownwards (R₁.obj Y₁)` and
 `(w.vComp w').structuredArrowDownwards Y₁.` -/

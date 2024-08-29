@@ -114,6 +114,7 @@ def obj (X : SimplicialObject C) : ChainComplex C ℕ :=
 
 variable {X} {Y : SimplicialObject C} (f : X ⟶ Y)
 
+set_option maxHeartbeats 400000 in
 /-- The normalized Moore complex functor, on morphisms.
 -/
 @[simps!]

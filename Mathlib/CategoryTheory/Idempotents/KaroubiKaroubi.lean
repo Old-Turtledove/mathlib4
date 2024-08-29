@@ -48,6 +48,7 @@ instance [Preadditive C] : Functor.Additive (inverse C) where
 def unitIso : 𝟭 (Karoubi C) ≅ toKaroubi (Karoubi C) ⋙ inverse C :=
   eqToIso (Functor.ext (by aesop_cat) (by aesop_cat))
 
+set_option maxHeartbeats 1600000 in
 attribute [local simp] p_comm_f in
 /-- The counit isomorphism of the equivalence -/
 @[simps]

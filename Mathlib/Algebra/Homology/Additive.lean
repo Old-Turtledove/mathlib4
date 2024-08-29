@@ -101,6 +101,7 @@ end HomologicalComplex
 
 namespace CategoryTheory
 
+set_option maxHeartbeats 1600000 in
 /-- An additive functor induces a functor between homological complexes.
 This is sometimes called the "prolongation".
 -/

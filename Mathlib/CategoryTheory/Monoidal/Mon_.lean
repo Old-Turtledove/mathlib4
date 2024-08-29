@@ -176,6 +176,7 @@ namespace CategoryTheory.LaxMonoidalFunctor
 
 variable {C} {D : Type u₂} [Category.{v₂} D] [MonoidalCategory.{v₂} D]
 
+set_option maxHeartbeats 3200000 in
 -- TODO: mapMod F A : Mod A ⥤ Mod (F.mapMon A)
 /-- A lax monoidal functor takes monoid objects to monoid objects.
 
@@ -253,6 +254,7 @@ def unitIso :
     (fun F =>
       MonoidalNatIso.ofComponents (fun _ => F.toFunctor.mapIso (eqToIso (by ext))))
 
+set_option maxHeartbeats 400000 in
 /-- Implementation of `Mon_.equivLaxMonoidalFunctorPUnit`. -/
 @[simps!]
 def counitIso : monToLaxMonoidal C ⋙ laxMonoidalToMon C ≅ 𝟭 (Mon_ C) :=

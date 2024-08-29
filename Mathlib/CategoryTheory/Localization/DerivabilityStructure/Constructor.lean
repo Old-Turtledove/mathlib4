@@ -50,6 +50,7 @@ namespace Constructor
 variable {D : Type*} [Category D] (L : C₂ ⥤ D) [L.IsLocalization W₂]
   {X₂ : C₂} {X₃ : D} (y : L.obj X₂ ⟶ X₃)
 
+set_option maxHeartbeats 3200000 in
 /-- Given `Φ : LocalizerMorphism W₁ W₂`, `L : C₂ ⥤ D` a localization functor for `W₂` and
 a morphism `y : L.obj X₂ ⟶ X₃`, this is the functor which sends `R : Φ.RightResolution d` to
 `(isoOfHom L W₂ R.w R.hw).inv ≫ y` in the category `w.CostructuredArrowDownwards y`

@@ -36,6 +36,7 @@ section
 
 variable (F F' : C₁ ⥤ C₂ ⥤ C₃ ⥤ C₄)
 
+set_option maxHeartbeats 6400000 in
 /-- Auxiliary definition for `mapTrifunctor`. -/
 @[simps]
 def mapTrifunctorObj {I₁ : Type*} (X₁ : GradedObject I₁ C₁) (I₂ I₃ : Type*) :
@@ -46,6 +47,7 @@ def mapTrifunctorObj {I₁ : Type*} (X₁ : GradedObject I₁ C₁) (I₂ I₃ :
   map {X₂ Y₂} φ :=
     { app := fun X₃ x => ((F.obj (X₁ x.1)).map (φ x.2.1)).app (X₃ x.2.2) }
 
+set_option maxHeartbeats 3200000 in
 /-- Given a trifunctor `F : C₁ ⥤ C₂ ⥤ C₃ ⥤ C₄` and types `I₁`, `I₂`, `I₃`,
 this is the obvious functor
 `GradedObject I₁ C₁ ⥤ GradedObject I₂ C₂ ⥤ GradedObject I₃ C₃ ⥤ GradedObject (I₁ × I₂ × I₃) C₄`.
@@ -220,6 +222,9 @@ noncomputable def mapTrifunctorMapFunctorObj (X₁ : GradedObject I₁ C₁)
 At nightly-2024-08-08 we needed to significantly increase the maxHeartbeats here.
 -/
 set_option maxHeartbeats 800000 in
+-- Script generation takes excessive time.
+set_option aesop.check.script false in
+set_option aesop.check.script.steps false in
 /-- Given a trifunctor `F : C₁ ⥤ C₂ ⥤ C₃ ⥤ C₄` and a map `p : I₁ × I₂ × I₃ → J`,
 this is the functor
 `GradedObject I₁ C₁ ⥤ GradedObject I₂ C₂ ⥤ GradedObject I₃ C₃ ⥤ GradedObject J C₄`

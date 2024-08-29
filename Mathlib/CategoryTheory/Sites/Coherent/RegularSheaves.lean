@@ -176,6 +176,7 @@ theorem parallelPair_pullback_initial {X B : C} (π : X ⟶ B)
     all_goals congr
     all_goals exact Comma.hom_ext _ _ (by erw [Over.comp_left]; simp [ij]) rfl
 
+set_option maxHeartbeats 400000 in
 /--
 Given a limiting pullback cone, the fork in `SingleEqualizerCondition` is limiting iff the diagram
 in `Presheaf.isSheaf_iff_isLimit_coverage` is limiting.

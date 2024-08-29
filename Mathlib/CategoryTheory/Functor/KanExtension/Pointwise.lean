@@ -73,6 +73,7 @@ def coconeAt (Y : D) : Cocone (CostructuredArrow.proj L Y ⋙ F) where
         simp only [assoc, NatTrans.naturality_assoc, Functor.comp_map,
           Functor.map_comp, comp_id] }
 
+set_option maxHeartbeats 1600000 in
 variable (L F) in
 /-- The cocones for `CostructuredArrow.proj L Y ⋙ F`, as a functor from `LeftExtension L F`. -/
 @[simps]
@@ -186,6 +187,7 @@ def coneAt (Y : D) : Cone (StructuredArrow.proj Y L ⋙ F) where
         congr 1
         apply E.hom.naturality }
 
+set_option maxHeartbeats 800000 in
 variable (L F) in
 /-- The cones for `StructuredArrow.proj Y L ⋙ F`, as a functor from `RightExtension L F`. -/
 @[simps]

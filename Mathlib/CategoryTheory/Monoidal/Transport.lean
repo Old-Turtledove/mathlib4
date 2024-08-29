@@ -154,6 +154,7 @@ def transportStruct (e : C ≌ D) : MonoidalCategoryStruct.{v₂} D where
     e.functor.mapIso ((Iso.refl _ ⊗ (e.unitIso.app _).symm) ≪≫ ρ_ (e.inverse.obj X)) ≪≫
       e.counitIso.app _
 
+set_option maxHeartbeats 400000 in
 /-- Transport a monoidal structure along an equivalence of (plain) categories.
 -/
 def transport (e : C ≌ D) : MonoidalCategory.{v₂} D :=

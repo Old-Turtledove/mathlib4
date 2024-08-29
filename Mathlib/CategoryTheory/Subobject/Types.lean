@@ -33,6 +33,7 @@ theorem subtype_val_mono {α : Type u} (s : Set α) : Mono (↾(Subtype.val : s 
 
 attribute [local instance] subtype_val_mono
 
+set_option maxHeartbeats 400000 in
 /-- The category of `MonoOver α`, for `α : Type u`, is equivalent to the partial order `Set α`.
 -/
 @[simps]

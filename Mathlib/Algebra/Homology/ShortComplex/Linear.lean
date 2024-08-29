@@ -37,6 +37,7 @@ instance : SMul R (S₁ ⟶ S₂) where
 @[simp] lemma smul_τ₂ (a : R) (φ : S₁ ⟶ S₂) : (a • φ).τ₂ = a • φ.τ₂ := rfl
 @[simp] lemma smul_τ₃ (a : R) (φ : S₁ ⟶ S₂) : (a • φ).τ₃ = a • φ.τ₃ := rfl
 
+set_option maxHeartbeats 400000 in
 instance : Module R (S₁ ⟶ S₂) where
   zero_smul := by aesop_cat
   one_smul := by aesop_cat

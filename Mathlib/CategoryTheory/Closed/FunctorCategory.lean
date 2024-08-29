@@ -28,6 +28,7 @@ The internal hom functor `F ⟶[C] -` -/
 def closedIhom (F : D ⥤ C) : (D ⥤ C) ⥤ D ⥤ C :=
   ((whiskeringRight₂ D Cᵒᵖ C C).obj internalHom).obj (Groupoid.invFunctor D ⋙ F.op)
 
+set_option maxHeartbeats 400000 in
 /-- Auxiliary definition for `CategoryTheory.Functor.closed`.
 The unit for the adjunction `(tensorLeft F) ⊣ (ihom F)`. -/
 @[simps]
@@ -42,6 +43,7 @@ def closedUnit (F : D ⥤ C) : 𝟭 (D ⥤ C) ⟶ tensorLeft F ⋙ closedIhom F 
       rw [coev_app_comp_pre_app_assoc, ← Functor.map_comp, tensorHom_def]
       simp }
 
+set_option maxHeartbeats 400000 in
 /-- Auxiliary definition for `CategoryTheory.Functor.closed`.
 The counit for the adjunction `(tensorLeft F) ⊣ (ihom F)`. -/
 @[simps]
@@ -55,6 +57,7 @@ def closedCounit (F : D ⥤ C) : closedIhom F ⋙ tensorLeft F ⟶ 𝟭 (D ⥤ C
       rw [tensorHom_def]
       simp }
 
+set_option maxHeartbeats 400000 in
 /-- If `C` is a monoidal closed category and `D` is a groupoid, then every functor `F : D ⥤ C` is
 closed in the functor category `F : D ⥤ C` with the pointwise monoidal structure. -/
 -- Porting note: removed `@[simps]`, as some of the generated lemmas were failing the simpNF linter,

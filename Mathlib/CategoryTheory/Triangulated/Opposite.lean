@@ -203,6 +203,7 @@ variable (C)
 
 namespace TriangleOpEquivalence
 
+set_option maxHeartbeats 1600000 in
 /-- The functor which sends a triangle `X ⟶ Y ⟶ Z ⟶ X⟦1⟧` in `C` to the triangle
 `op Z ⟶ op Y ⟶ op X ⟶ (op Z)⟦1⟧` in `Cᵒᵖ` (without introducing signs). -/
 @[simps]
@@ -222,6 +223,7 @@ noncomputable def functor : (Triangle C)ᵒᵖ ⥤ Triangle Cᵒᵖ where
           opShiftFunctorEquivalence_counitIso_inv_naturality_assoc]
         rfl }
 
+set_option maxHeartbeats 1600000 in
 /-- The functor which sends a triangle `X ⟶ Y ⟶ Z ⟶ X⟦1⟧` in `Cᵒᵖ` to the triangle
 `Z.unop ⟶ Y.unop ⟶ X.unop ⟶ Z.unop⟦1⟧` in `C` (without introducing signs). -/
 @[simps]
@@ -240,6 +242,7 @@ noncomputable def inverse : Triangle Cᵒᵖ ⥤ (Triangle C)ᵒᵖ where
           ← op_comp_assoc, ← Functor.map_comp, ← unop_comp, ← φ.comm₃,
           unop_comp, Functor.map_comp, op_comp, assoc]) }
 
+set_option maxHeartbeats 1600000 in
 /-- The unit isomorphism of the
 equivalence `triangleOpEquivalence C : (Triangle C)ᵒᵖ ≌ Triangle Cᵒᵖ` . -/
 @[simps!]
@@ -250,6 +253,7 @@ noncomputable def unitIso : 𝟭 _ ≅ functor C ⋙ inverse C :=
         (by simp [shift_unop_opShiftFunctorEquivalence_counitIso_inv_app]))))
     (fun {T₁ T₂} f => Quiver.Hom.unop_inj (by aesop_cat))
 
+set_option maxHeartbeats 1600000 in
 /-- The counit isomorphism of the
 equivalence `triangleOpEquivalence C : (Triangle C)ᵒᵖ ≌ Triangle Cᵒᵖ` . -/
 @[simps!]
@@ -268,6 +272,7 @@ noncomputable def counitIso : inverse C ⋙ functor C ≅ 𝟭 _ :=
 
 end TriangleOpEquivalence
 
+set_option maxHeartbeats 400000 in
 /-- An anti-equivalence between the categories of triangles in `C` and in `Cᵒᵖ`.
 A triangle in `Cᵒᵖ` shall be distinguished iff it correspond to a distinguished
 triangle in `C` via this equivalence. -/

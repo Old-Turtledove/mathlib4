@@ -168,6 +168,7 @@ theorem lift_obj_arrow {Y : D} (F : Over Y ⥤ Over X)
     ((lift F h).obj f).arrow = (F.obj ((forget Y).obj f)).hom :=
   rfl
 
+set_option maxHeartbeats 400000 in
 /-- Monomorphisms over an object `f : Over A` in an over category
 are equivalent to monomorphisms over the source of `f`.
 -/
@@ -268,6 +269,7 @@ section
 
 variable (X)
 
+set_option maxHeartbeats 400000 in
 /-- An equivalence of categories `e` between `C` and `D` induces an equivalence between
     `MonoOver X` and `MonoOver (e.functor.obj X)` whenever `X` is an object of `C`. -/
 @[simps]

@@ -215,6 +215,7 @@ def induction {d : D} (Z : ∀ (X : C) (_ : d ⟶ F.obj X), Sort*)
 
 variable {F G}
 
+set_option maxHeartbeats 400000 in
 /-- Given a cocone over `F ⋙ G`, we can construct a `Cocone G` with the same cocone point.
 -/
 @[simps]
@@ -485,6 +486,7 @@ def induction {d : D} (Z : ∀ (X : C) (_ : F.obj X ⟶ d), Sort*)
 
 variable {F G}
 
+set_option maxHeartbeats 800000 in
 /-- Given a cone over `F ⋙ G`, we can construct a `Cone G` with the same cocone point.
 -/
 @[simps]

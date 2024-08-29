@@ -320,6 +320,7 @@ attribute [local simp] whisker_exchange
 theorem liftHom₂_congr {a b : FreeBicategory B} {f g : a ⟶ b} {η θ : Hom₂ f g} (H : Rel η θ) :
     liftHom₂ F η = liftHom₂ F θ := by induction H <;> (dsimp [liftHom₂]; aesop_cat)
 
+set_option maxHeartbeats 400000 in
 /-- A prefunctor from a quiver `B` to a bicategory `C` can be lifted to a pseudofunctor from
 `free_bicategory B` to `C`.
 -/

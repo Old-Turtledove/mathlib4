@@ -69,7 +69,7 @@ theorem d_eqToHom (X : HomologicalComplex V (ComplexShape.up' b)) {x y z : β} (
     X.d x y ≫ eqToHom (congr_arg X.X h) = X.d x z := by cases h; simp
 
 open Classical in
-set_option maxHeartbeats 400000 in
+set_option maxHeartbeats 3200000 in
 /-- The functor from differential graded objects to homological complexes.
 -/
 @[simps]
@@ -94,6 +94,7 @@ def dgoToHomologicalComplex :
         have : f.f i ≫ Y.d i = X.d i ≫ f.f _ := (congr_fun f.comm i).symm
         rw [reassoc_of% this] }
 
+set_option maxHeartbeats 800000 in
 /-- The functor from homological complexes to differential graded objects.
 -/
 @[simps]
@@ -105,6 +106,7 @@ def homologicalComplexToDGO :
       d := fun i => X.d i _ }
   map {X Y} f := { f := f.f }
 
+set_option maxHeartbeats 400000 in
 /-- The unit isomorphism for `dgoEquivHomologicalComplex`.
 -/
 @[simps!]
@@ -115,6 +117,7 @@ def dgoEquivHomologicalComplexUnitIso :
     { hom := { f := fun i => 𝟙 (X.obj i) }
       inv := { f := fun i => 𝟙 (X.obj i) } })
 
+set_option maxHeartbeats 400000 in
 /-- The counit isomorphism for `dgoEquivHomologicalComplex`.
 -/
 @[simps!]

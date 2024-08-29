@@ -220,10 +220,10 @@ abbrev bco {v : Level} {M : Q(Type v)} {R : Q(Type)} (_i₂ : Q(Ring $R))
 section
 variable {v : Level} (M : Q(Type v)) (iM : Q(AddCommMonoid $M))
   {R₁ : Q(Type)} {iR₁ : Q(Semiring $R₁)} (iRM₁ : Q(@Module $R₁ $M $iR₁ $iM))
+  {R₂ : Q(Type)} {iR₂ : Q(Semiring $R₂)} (iRM₂ : Q(@Module $R₂ $M $iR₂ $iM))
 
 def matchRings  (x₁ x₂ : Q($M))
     (l₁ : List (Q($R₁ × $M) × ℕ)) (pf₁ : Q($x₁ = smulAndSum $((l₁.map Prod.fst).quote)))
-    {R₂ : Q(Type)} {iR₂ : Q(Semiring $R₂)} (iRM₂ : Q(@Module $R₂ $M $iR₂ $iM))
     (l₂ : List (Q($R₂ × $M) × ℕ)) (pf₂ : Q($x₂ = smulAndSum $((l₂.map Prod.fst).quote))) :
     MetaM <| Σ R : Q(Type), Σ iR : Q(Semiring $R), Σ _ : Q(@Module $R $M $iR $iM),
       Σ l₁ l₂ : List (Q($R × $M) × ℕ),
@@ -249,9 +249,10 @@ def matchRings  (x₁ x₂ : Q($M))
     let l₂' : List (Q($R₁ × $M) × ℕ) := l₂.onFst (fun p ↦ q(considerFstAs $R₁ $p))
     pure ⟨R₁, iR₁, iRM₁, l₁, l₂', pf₁, (q(eq_smulAndSum_considerFstAs $R₁ $pf₂):)⟩
 
-def matchRings' (x : Q($M))
-    (l : List (Q($R₁ × $M) × ℕ)) (pf : Q($x = smulAndSum $((l.map Prod.fst).quote)))
-    {R₂ : Q(Type)} (iR₂ : Q(Semiring $R₂)) (iRM₂ : Q(@Module $R₂ $M $iR₂ $iM)) (r₂ : Q($R₂)) :
+variable (iR₂)
+
+def matchRings' (x : Q($M)) (l : List (Q($R₁ × $M) × ℕ))
+    (pf : Q($x = smulAndSum $((l.map Prod.fst).quote))) (r₂ : Q($R₂)) :
     MetaM <| Σ R : Q(Type), Σ iR : Q(Semiring $R), Σ _ : Q(@Module $R $M $iR $iM),
       Σ l : List (Q($R × $M) × ℕ),
       Q($x = smulAndSum $((l.map Prod.fst).quote))
@@ -273,14 +274,14 @@ def matchRings' (x : Q($M))
     let _i₁ ← synthInstanceQ q(CommSemiring $R₂)
     let _i₃ ← synthInstanceQ q(Algebra $R₂ $R₁)
     let _i₄ ← synthInstanceQ q(IsScalarTower $R₂ $R₁ $M)
-    assumeInstancesCommute
     let r : Q($R₁) := q(algebraMap $R₂ $R₁ $r₂)
     let pf' : Q($r₂ • $x = $r • $x) := q(Eq.symm (IsScalarTower.algebraMap_smul $R₁ $r₂ $x))
     pure ⟨R₁, iR₁, iRM₁, l, pf, r, pf'⟩
 
-def liftRing (x₁ : Q($M))
-    (l₁ : List (Q($R₁ × $M) × ℕ)) (pf₁ : Q($x₁ = smulAndSum $((l₁.map Prod.fst).quote)))
-    (R₂ : Q(Type)) (iR₂ : Q(Semiring $R₂)) (iRM₂ : Q(@Module $R₂ $M $iR₂ $iM)) :
+variable (R₂)
+
+def liftRing (x₁ : Q($M)) (l₁ : List (Q($R₁ × $M) × ℕ))
+    (pf₁ : Q($x₁ = smulAndSum $((l₁.map Prod.fst).quote))) :
     MetaM <| Σ R : Q(Type), Σ iR : Q(Semiring $R), Σ _ : Q(@Module $R $M $iR $iM),
       Σ l₁ : List (Q($R × $M) × ℕ), Q($x₁ = smulAndSum $((l₁.map Prod.fst).quote)) := do
   match ← isDefEqQ R₁ R₂ with
@@ -455,7 +456,7 @@ partial def parse {v : Level} (M : Q(Type v)) (iM : Q(AddCommMonoid $M)) (x : Q(
     -- lift from the semirings of scalars parsed from `x₁`, `x₂` (say `R₁`, `R₂`) to `R₁ ⊗ R₂`
     let ⟨R, iR, iRM, l₁, l₂, (pf₁ : Q($x₁ = smulAndSum $((l₁.map Prod.fst).quote))),
       (pf₂ : Q($x₂ = smulAndSum $((l₂.map Prod.fst).quote)))⟩
-      ← matchRings M iM iRM₁ x₁ x₂ l₁' pf₁' iRM₂ l₂' pf₂'
+      ← matchRings M iM iRM₁ iRM₂ x₁ x₂ l₁' pf₁' l₂' pf₂'
     -- build the new list and proof
     let l := combine (cob iR) id l₁ l₂
     let pf := mkSmulAndSum_add iRM l₁ l₂
@@ -466,9 +467,9 @@ partial def parse {v : Level} (M : Q(Type v)) (iM : Q(AddCommMonoid $M)) (x : Q(
     let ⟨_, _, iRM₂, l₂, pf₂⟩ ← parse M iM x₂
     -- lift from the semirings of scalars parsed from `x₁`, `x₂` (say `R₁`, `R₂`) to `R₁ ⊗ R₂ ⊗ ℤ`
     let iMZ ← synthInstanceQ q(Module ℤ $M)
-    let ⟨_, _, iRM₁', l₁', pf₁'⟩ ← liftRing M iM iRM₁ x₁ l₁ pf₁ q(ℤ) q(Int.instSemiring) iMZ
-    let ⟨_, _, iRM₂', l₂', pf₂'⟩ ← liftRing M iM iRM₂ x₂ l₂ pf₂ q(ℤ) q(Int.instSemiring) iMZ
-    let ⟨R, iR, iRM, l₁'', l₂'', pf₁'', pf₂''⟩ ← matchRings M iM iRM₁' x₁ x₂ l₁' pf₁' iRM₂' l₂' pf₂'
+    let ⟨_, _, iRM₁', l₁', pf₁'⟩ ← liftRing M iM iRM₁ q(ℤ) q(Int.instSemiring) iMZ x₁ l₁ pf₁
+    let ⟨_, _, iRM₂', l₂', pf₂'⟩ ← liftRing M iM iRM₂ q(ℤ) q(Int.instSemiring) iMZ x₂ l₂ pf₂
+    let ⟨R, iR, iRM, l₁'', l₂'', pf₁'', pf₂''⟩ ← matchRings M iM iRM₁' iRM₂' x₁ x₂ l₁' pf₁' l₂' pf₂'
     let iR' ← synthInstanceQ q(Ring $R)
     -- build the new list and proof
     let l := combine (boc iR') (bco iR') l₁'' l₂''
@@ -479,11 +480,10 @@ partial def parse {v : Level} (M : Q(Type v)) (iM : Q(AddCommMonoid $M)) (x : Q(
   -- parse a negation: `-y`
   | ~q(@Neg.neg _ $iM' $y) =>
     let ⟨_, _, iRM₀, l₀, pf₀⟩ ← parse M iM y
-    let iZ ← synthInstanceQ q(Semiring ℤ)
     let _i ← synthInstanceQ q(AddCommGroup $M)
     let iMZ ← synthInstanceQ q(Module ℤ $M)
     -- lift from original semiring of scalars (say `R₀`) to `R₀ ⊗ ℤ`
-    let ⟨R, iR, iRM, l, pf⟩ ← liftRing M iM iRM₀ y l₀ pf₀ q(ℤ) iZ iMZ
+    let ⟨R, iR, iRM, l, pf⟩ ← liftRing M iM iRM₀ q(ℤ) q(Int.instSemiring) iMZ y l₀ pf₀
     let _i' ← synthInstanceQ q(Ring $R)
     assumeInstancesCommute
     -- build the new list and proof
@@ -496,7 +496,7 @@ partial def parse {v : Level} (M : Q(Type v)) (iM : Q(AddCommMonoid $M)) (x : Q(
     let i₂ ← synthInstanceQ q(Module $S $M)
     assumeInstancesCommute
     -- lift from original semiring of scalars (say `R₀`) to `R₀ ⊗ S`
-    let ⟨R, iR, iRM, l, pf₂, s, pf₁⟩ ← matchRings' M iM iRM₀ y l₀ pf₀ i₁ i₂ s₀
+    let ⟨R, iR, iRM, l, pf₂, s, pf₁⟩ ← matchRings' M iM iRM₀ i₁ i₂ y l₀ pf₀ s₀
     -- build the new list and proof
     let sl : List (Q($R × $M) × ℕ) := l.onFst (fun p ↦ q(($s * Prod.fst $p, Prod.snd $p)))
     pure ⟨R, iR, iRM, sl, (q((Eq.trans $pf₁ (smul_eq_smulAndSum $pf₂ $s))) :)⟩
@@ -600,7 +600,7 @@ def matchScalarsAux (g : MVarId) : AtomM (List MVarId) := do
   let pf₂ : Q($rhs = smulAndSum $ll₂) := e₂.snd.snd.snd.snd
   trace[debug] "unpacked the RHS parse successfully"
   -- lift LHS and RHS to same scalar ring
-  let ⟨R, iR, iRM, l₁', l₂', pf₁', pf₂'⟩ ← matchRings M iM iRM₁ lhs rhs l₁ pf₁ iRM₂ l₂ pf₂
+  let ⟨R, iR, iRM, l₁', l₂', pf₁', pf₂'⟩ ← matchRings M iM iRM₁ iRM₂ lhs rhs l₁ pf₁ l₂ pf₂
   -- start to rig up the collection of goals we will reduce to
   let ll₁' : Q(List ($R × $M)) := (l₁'.map Prod.fst).quote
   let ll₂' : Q(List ($R × $M)) := (l₂'.map Prod.fst).quote

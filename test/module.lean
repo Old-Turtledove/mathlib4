@@ -23,7 +23,6 @@ variable [AddCommMonoid V]
 
 example : x + (y + x) = x + x + y := by module
 example : (3 : ℕ) • x = x + (2 : ℕ) • x := by module
-example : x + (y + (x + (z + (x + (u + (x + v)))))) = v + u + z + y + 4 • x := by module
 example : 0 + x = x := by module
 example (n : ℕ) : n • x = n • x := by module
 example (n : ℕ) : 0 + n • x = n • x := by module
@@ -62,7 +61,6 @@ example : x - 0 = x := by module
 example : (3 : ℤ) • x = x + (2 : ℤ) • x := by module
 example : x - 2 • y = x - 2 • y := by module
 example : (x + y) - ((y + x) + x) = -x := by module
-example : (3 : ℤ) • x = x + (2 : ℤ) • x := by module
 example : x + y + (z + w - x) = y + z + w := by module
 example : x + y + z + (z - x - x) = (-1) • x + y + 2 • z := by module
 example : -x + x = 0 := by module
@@ -114,6 +112,12 @@ example : a • x - b • x = (a - b) • x := by module
 example : a • x - b • y = a • x + (-b) • y := by module
 example : 2 • a • x = a • 2 • x := by module
 example : a • x - b • y = a • x + (-b) • y := by module
+example : (μ - ν) • a • x = (a • μ • x + b • ν • y) - ν • (a • x + b • y) := by module
+example : (μ - ν) • b • y = μ • (a • x + b • y) - (a • μ • x + b • ν • y) := by module
+
+-- from https://leanprover.zulipchat.com/#narrow/stream/287929-mathlib4/topic/smul.20diamond/near/457163013
+example : (4 : ℤ) • v = (4 : K) • v := by module
+example : (4 : ℕ) • v = (4 : K) • v := by module
 
 -- from https://leanprover.zulipchat.com/#narrow/stream/287929-mathlib4/topic/linear_combination.20for.20groups/near/437042918
 example : (1 + a ^ 2) • (v + w) - a • (a • v - w) = v + (1 + a + a ^ 2) • w := by module
@@ -136,14 +140,6 @@ example (h : a ^ 2 + b ^ 2 = 1) : a • (a • x - b • y) + (b • a • y + b
   -- `linear_combination h • x`
   apply eq_of_add (congr($h • x):)
   module
-
--- from https://leanprover.zulipchat.com/#narrow/stream/287929-mathlib4/topic/smul.20diamond/near/457163013
-example : (4 : ℤ) • v = (4 : K) • v := by module
-example : (4 : ℕ) • v = (4 : K) • v := by module
-
-example : (μ - ν) • a • x = (a • μ • x + b • ν • y) - ν • (a • x + b • y) := by module
-
-example : (μ - ν) • b • y = μ • (a • x + b • y) - (a • μ • x + b • ν • y) := by module
 
 example (h1 : a • x + b • y = 0) (h2 : a • μ • x + b • ν • y = 0) : (μ - ν) • a • x = 0 := by
   -- `linear_combination h2 - ν • h1`

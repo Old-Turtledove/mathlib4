@@ -34,10 +34,13 @@ def List.quote {v : Level} {α : Q(Type v)} : List (Q($α)) → Q(List $α)
 
 /-! ### Constructing the linear combination of a list of pairs (scalar, vector) -/
 
-abbrev List.smulAndSum {R : Type*} {M : Type*} [SMul R M] [Add M] [Zero M] (l : List (R × M)) : M :=
+section
+variable {R : Type*} {M : Type*}
+
+abbrev List.smulAndSum [SMul R M] [Add M] [Zero M] (l : List (R × M)) : M :=
   (l.map (fun (⟨r, x⟩ : R × M) ↦ r • x)).sum
 
-@[simp] theorem List.smulAndSum_cons {R : Type*} {M : Type*} [SMul R M] [AddMonoid M] (p : R × M)
+@[simp] theorem List.smulAndSum_cons [SMul R M] [AddMonoid M] (p : R × M)
     (l : List (R × M)) :
     (p :: l).smulAndSum = p.1 • p.2 + l.smulAndSum := by
   unfold smulAndSum
@@ -51,21 +54,21 @@ theorem List.one_pf {M : Type*} [AddMonoid M] (x : M) : x = [((1:ℕ), x)].smulA
 theorem List.zero_pf (M : Type*) [AddMonoid M] : (0:M) = [].smulAndSum (R := Nat) := by
   simp [smulAndSum]
 
-theorem List.smulAndSum_cons_add_cons₁ {R : Type*} {M : Type*} [SMul R M] [AddMonoid M]
+theorem List.smulAndSum_cons_add_cons₁ [SMul R M] [AddMonoid M]
     (a₁ a₂ : R × M) (l₁ l₂ : List (R × M)):
     (a₁ :: l₁).smulAndSum + (a₂ :: l₂).smulAndSum
       = a₁.1 • a₁.2 + (l₁.smulAndSum + (a₂ :: l₂).smulAndSum) := by
   rw [smulAndSum_cons]
   rw [add_assoc]
 
-theorem List.smulAndSum_cons_sub_cons₁ {R : Type*} {M : Type*} [SMul R M] [AddGroup M]
+theorem List.smulAndSum_cons_sub_cons₁ [SMul R M] [AddGroup M]
     (a₁ a₂ : R × M) (l₁ l₂ : List (R × M)):
     (a₁ :: l₁).smulAndSum - (a₂ :: l₂).smulAndSum
       = a₁.1 • a₁.2 + (l₁.smulAndSum - (a₂ :: l₂).smulAndSum) := by
   rw [smulAndSum_cons]
   rw [add_sub_assoc]
 
-theorem List.smulAndSum_cons_add_cons₂ {R : Type*} {M : Type*} [SMul R M] [AddCommMonoid M]
+theorem List.smulAndSum_cons_add_cons₂ [SMul R M] [AddCommMonoid M]
     (a₁ a₂ : R × M) (l₁ l₂ : List (R × M)):
     (a₁ :: l₁).smulAndSum + (a₂ :: l₂).smulAndSum
       = (a₁.1 • a₁.2 + a₂.1 • a₂.2) + (l₁.smulAndSum + l₂.smulAndSum) := by
@@ -75,7 +78,7 @@ theorem List.smulAndSum_cons_add_cons₂ {R : Type*} {M : Type*} [SMul R M] [Add
   congr! 1
   rw [add_comm]
 
-theorem List.smulAndSum_cons_sub_cons₂ {R : Type*} {M : Type*} [SMul R M] [AddCommGroup M]
+theorem List.smulAndSum_cons_sub_cons₂ [SMul R M] [AddCommGroup M]
     (a₁ a₂ : R × M) (l₁ l₂ : List (R × M)):
     (a₁ :: l₁).smulAndSum - (a₂ :: l₂).smulAndSum
       = (a₁.1 • a₁.2 - a₂.1 • a₂.2) + (l₁.smulAndSum - l₂.smulAndSum) := by
@@ -85,7 +88,7 @@ theorem List.smulAndSum_cons_sub_cons₂ {R : Type*} {M : Type*} [SMul R M] [Add
   congr! 1
   rw [add_comm]
 
-theorem List.smulAndSum_cons_add_cons₃ {R : Type*} {M : Type*} [SMul R M] [AddCommMonoid M]
+theorem List.smulAndSum_cons_add_cons₃ [SMul R M] [AddCommMonoid M]
     (a₁ a₂ : R × M) (l₁ l₂ : List (R × M)) :
     (a₁ :: l₁).smulAndSum + (a₂ :: l₂).smulAndSum
       = a₂.1 • a₂.2 + ((a₁ :: l₁).smulAndSum + l₂.smulAndSum) := by
@@ -95,7 +98,7 @@ theorem List.smulAndSum_cons_add_cons₃ {R : Type*} {M : Type*} [SMul R M] [Add
   congr! 1
   rw [add_comm]
 
-theorem List.smulAndSum_cons_sub_cons₃ {R : Type*} {M : Type*} [SMul R M] [AddCommGroup M]
+theorem List.smulAndSum_cons_sub_cons₃ [SMul R M] [AddCommGroup M]
     (a₁ a₂ : R × M) (l₁ l₂ : List (R × M)) :
     (a₁ :: l₁).smulAndSum - (a₂ :: l₂).smulAndSum
       = -(a₂.1 • a₂.2) + ((a₁ :: l₁).smulAndSum - l₂.smulAndSum) := by
@@ -104,7 +107,7 @@ theorem List.smulAndSum_cons_sub_cons₃ {R : Type*} {M : Type*} [SMul R M] [Add
   rw [add_comm]
   simp only [add_assoc]
 
-theorem List.smulAndSum_neg {M : Type*} [AddCommGroup M] {R : Type*} [Ring R] [Module R M]
+theorem List.smulAndSum_neg [AddCommGroup M] [Ring R] [Module R M]
     (l : List (R × M)) :
     (l.onFst Neg.neg).smulAndSum = - l.smulAndSum := by
   simp only [smulAndSum, List.map_map, List.sum_neg]
@@ -112,12 +115,12 @@ theorem List.smulAndSum_neg {M : Type*} [AddCommGroup M] {R : Type*} [Ring R] [M
   ext p
   simp
 
-theorem List.neg_eq_smulAndSum {M : Type*} [AddCommGroup M] {R : Type*} [Ring R] [Module R M]
+theorem List.neg_eq_smulAndSum [AddCommGroup M] [Ring R] [Module R M]
     {l : List (R × M)} {x : M} (h : x = l.smulAndSum) :
     - x = (l.onFst Neg.neg).smulAndSum := by
   simpa [smulAndSum_neg]
 
-theorem List.smul_eq_smulAndSum {M : Type*} [AddCommMonoid M] {R : Type*} [Semiring R] [Module R M]
+theorem List.smul_eq_smulAndSum [AddCommMonoid M] [Semiring R] [Module R M]
     {l : List (R × M)} {x : M} (h : x = l.smulAndSum) (r : R) :
     r • x = (l.onFst (r * ·)).smulAndSum := by
   unfold smulAndSum at h ⊢
@@ -126,23 +129,25 @@ theorem List.smul_eq_smulAndSum {M : Type*} [AddCommMonoid M] {R : Type*} [Semir
   ext p
   simp [mul_smul]
 
-theorem eq_cons_cons {R : Type*} {M : Type*} [AddMonoid M] [Zero R] [SMul R M] {r₁ r₂ : R} (m : M)
+theorem eq_cons_cons [AddMonoid M] [Zero R] [SMul R M] {r₁ r₂ : R} (m : M)
     {l₁ l₂ : List (R × M)} (h1 : r₁ = r₂) (h2 : l₁.smulAndSum = l₂.smulAndSum) :
       ((r₁, m) :: l₁).smulAndSum = ((r₂, m) :: l₂).smulAndSum := by
   simp only [smulAndSum] at *
   simp [h1, h2]
 
-theorem eq_cons_const {R : Type*} {M : Type*} [AddCommMonoid M] [Semiring R] [Module R M] {r : R}
+theorem eq_cons_const [AddCommMonoid M] [Semiring R] [Module R M] {r : R}
     (m : M) {n : M} {l : List (R × M)} (h1 : r = 0) (h2 : l.smulAndSum = n) :
     ((r, m) :: l).smulAndSum = n := by
   simp only [smulAndSum] at *
   simp [h1, h2]
 
-theorem eq_const_cons {R : Type*} {M : Type*} [AddCommMonoid M] [Semiring R] [Module R M] {r : R}
+theorem eq_const_cons [AddCommMonoid M] [Semiring R] [Module R M] {r : R}
     (m : M) {n : M} {l : List (R × M)} (h1 : 0 = r) (h2 : n = l.smulAndSum) :
     n = ((r, m) :: l).smulAndSum := by
   simp only [smulAndSum] at *
   simp [← h1, h2]
+
+end
 
 /-! ### Further algebraic operations -/
 

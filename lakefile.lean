@@ -105,6 +105,11 @@ lean_exe shake where
 lean_exe «lint-style» where
   srcDir := "scripts"
 
+/-- `lake exe check-title-labels` checks if a PR title is correctly formatted,
+and if the PR has required area labels. -/
+lean_exe «check-title-labels» where
+  srcDir := "scripts"
+
 /--
 `lake exe pole` queries the Mathlib speedcenter for build times for the current commit,
 and then calculates the longest pole

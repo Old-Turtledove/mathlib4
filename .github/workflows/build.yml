@@ -85,9 +85,9 @@ jobs:
         run: |
           set -eo pipefail
           title="${{github.event.pull_request.title}}"
-          echo $title
+          echo "$title"
           label_names=$(echo "${{ toJson(github.event.pull_request.labels) }}" | jq -r '.[].name')
-          echo $label_names
+          echo "$label_names"
           lake exe check-title-labels $title $label_names
 
       - name: Install bibtool

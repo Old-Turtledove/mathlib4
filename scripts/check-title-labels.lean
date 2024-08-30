@@ -55,7 +55,7 @@ def validate_title(title: String) : IO UInt32 := do
 Check if a combination of PR labels is considered contradictory.
 `labels` contains the names of this PR's labels.
 -/
-def has_contradictory_labels(labels : List String) : Bool := Id.run do
+def has_contradictory_labels(labels : Array String) : Bool := Id.run do
   -- Combine common labels.
   let substitutions := [
     ("ready-to-merge", "bors"), ("auto-merge-after-CI", "bors"),
@@ -85,8 +85,7 @@ open Cli in
 The exit code is the number of violations found. -/
 def checkTitleLabelsCLI (args : Parsed) : IO UInt32 := do
   let title := (args.positionalArg! "title").value
-  let labels : String := (args.positionalArg! "labels").value
-  let labels := labels.splitOn " "
+  let labels : Array String := args.variableArgsAs! String
   let mut numberErrors := 0
   if !labels.contains "WIP" then
     -- We do not complain about WIP PRs.
@@ -102,6 +101,7 @@ def checkTitleLabelsCLI (args : Parsed) : IO UInt32 := do
     numberErrors := numberErrors + 1
   return numberErrors
 
+
 open Cli in
 /-- Setting up command line options and help text for `lake exe check-title-labels`. -/
 def checkTitleLabels : Cmd := `[Cli|
@@ -112,7 +112,7 @@ def checkTitleLabels : Cmd := `[Cli|
 
   ARGS:
     title : String; "this PR's title"
-    labels : String; "space-separated list of label names of this PR"
+    ...labels : Array String; "list of label names of this PR"
 ]
 
 /-- The entrypoint to the `lake exe check-title-labels` command. -/

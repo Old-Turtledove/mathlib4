@@ -17,12 +17,16 @@ Return the number of individual violations found.
 -/
 def validate_title(title: String) : IO UInt32 := do
   -- The title should be of the form "abbrev: main title" or "abbrev(scope): main title".
-  let parts := title.splitOn ":"
-  if parts.length < 2 then
-    IO.println "error: the PR title does not contains a colon"
+  if !title.contains ':' then
+    IO.println "error: the PR title does not contain a colon"
     return 1
   let mut numberErrors : UInt32 := 0
-  let main := parts[1]!
+
+  let idx := title.find (· == ':')
+  -- Split 'title' at the first occurrence of ':'.
+  -- XXX: is there better API for this, say in batteries?
+  let kind := title.extract 0 idx
+  let main := title.extract (title.next idx) title.endPos
   if main.endsWith "." then
     IO.println "error: the PR title should not end with a full stop"
     numberErrors := numberErrors + 1
@@ -30,24 +34,28 @@ def validate_title(title: String) : IO UInt32 := do
     IO.println "error: the PR should have the form 'abbrev: main title', with a space"
     numberErrors := numberErrors + 1
   let main := main.removeLeadingSpaces
+  -- FIXME: let main := main.dropPrefix " " from batteries would be better!
   if main.front.toLower != main.front then
     IO.println "error: the main PR title should be lowercased"
     numberErrors := numberErrors + 1
 
-  let kind := parts[0]!
-  let parts := kind.splitOn "("
-  if parts.length >= 2 then
-    if !kind.contains ')' then
-      IO.println "error: the PR kind should be of the form abbrev or abbrev(scope)"
-      numberErrors := numberErrors + 1
-  else if kind.contains ')' then
+  let N := (kind.splitOn "(").length
+  let M := (kind.splitOn ")").length
+  let known_kinds := ["feat", "chore", "perf", "refactor", "style", "fix", "doc"]
+  if N > 2 || M > 2 then
     IO.println "error: the PR kind should be of the form abbrev or abbrev(scope)"
     numberErrors := numberErrors + 1
-
-  let known_kinds := ["feat", "chore", "perf", "refactor", "style", "fix", "doc"]
-  if !known_kinds.contains (parts.get! 0) then
-    IO.println s!"error: the PR kind should be one of {", ".intercalate (known_kinds.map (s!"\"{·}\""))}"
+  else if (N == 2 && M == 1) || (N == 1 && M == 2) then
+    IO.println "error: the PR kind should be of the form abbrev or abbrev(scope)"
     numberErrors := numberErrors + 1
+  else if (N == 2) && (M == 2) then
+    numberErrors := 0
+    -- TODO: split kind and scope; then validate kind and scope
+  else
+    -- N == M == 1, i.e. no scope in parentheses
+    if !known_kinds.contains kind then
+      IO.println s!"error: the PR kind should be one of {", ".intercalate (known_kinds.map (s!"\"{·}\""))}"
+      numberErrors := numberErrors + 1
   return numberErrors
 
 

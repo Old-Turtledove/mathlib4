@@ -2594,6 +2594,7 @@ import Mathlib.Dynamics.TopologicalEntropy.CoverEntropy
 import Mathlib.Dynamics.TopologicalEntropy.DynamicalEntourage
 import Mathlib.Dynamics.TopologicalEntropy.Morphism
 import Mathlib.Dynamics.TopologicalEntropy.NetEntropy
+import Mathlib.Dynamics.TopologicalEntropy.PiEntourage
 import Mathlib.Dynamics.TopologicalEntropy.Product
 import Mathlib.Dynamics.TopologicalEntropy.Shift
 import Mathlib.Dynamics.TopologicalEntropy.Subset

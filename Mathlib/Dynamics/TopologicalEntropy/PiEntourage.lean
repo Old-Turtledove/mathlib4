@@ -5,7 +5,7 @@ Authors: Damien Thomine, Pietro Monticone
 -/
 import Mathlib.Order.Interval.Finset.Nat
 import Mathlib.Order.OmegaCompletePartialOrder
-import Mathlib.Topology.UniformSpace.Basic
+import Mathlib.Topology.UniformSpace.UniformConvergenceTopology
 
 /-!
 # Dynamical entourages
@@ -33,10 +33,74 @@ these dynamical entourages.
 
 namespace Dynamics
 
-open Prod Set Uniformity UniformSpace
+open Prod Set Uniformity UniformSpace UniformConvergence
 
-variable {X : Type*}
+/-! ### Pi entourages -/
 
+/-- Pi entourages-/
+lemma UniformFun.mem_ball_gen {α β : Type*} (U : Set (β × β)) (f g : α →ᵤ β) :
+  g ∈ ball f (UniformFun.gen α β U) ↔  ∀ i : α, (f i, g i) ∈ U := by rfl
+
+lemma UniformFun.idRel_subset_gen (α : Type*) {β : Type*} {U : Set (β × β)} (h : idRel ⊆ U) :
+    idRel ⊆ UniformFun.gen α β U := by
+  intro (f, g) f_g
+  rw [mem_idRel] at f_g
+  rw [UniformFun.mem_gen, f_g]
+  exact fun i ↦ h (mem_idRel.2 (Eq.refl (g i)))
+
+lemma UniformFun.comp_gen_subset (α : Type*) {β : Type*} (U V : Set (β × β)) :
+    (UniformFun.gen α β U) ○ (UniformFun.gen α β V) ⊆ UniformFun.gen α β (U ○ V) := by
+  intro (f, g)
+  simp only [compRel, UniformFun.mem_gen, mem_setOf_eq, forall_exists_index, and_imp]
+  exact fun h f_h h_g i ↦ ⟨h i, ⟨f_h i, h_g i⟩⟩
+
+lemma _root_.SymmetricRel.uniformFun_gen (α : Type*) {β : Type*} {U : Set (β × β)}
+    (U_symm : SymmetricRel U) :
+    SymmetricRel (UniformFun.gen α β U) := by
+  ext fg
+  rw [mem_preimage, UniformFun.mem_gen, UniformFun.mem_gen, fst_swap, snd_swap]
+  exact Iff.of_eq (forall_congr fun i ↦ eq_iff_iff.2 U_symm.mk_mem_comm)
+
+/-! ### Dynamical entourages -/
+
+/-- Another definition of dynamical entourages.-/
+def dynEntourage' {X : Type*} (T : X → X) (U : Set (X × X)) (n : ℕ) : Set (X × X) :=
+  {(x, y) : X × X | (fun k : Fin n ↦ T^[k] x, fun k : Fin n ↦ T^[k] y) ∈ UniformFun.gen (Fin n) X U}
+
+lemma mem_dynEntourage' {X : Type*} {T : X → X} {U : Set (X × X)} {n : ℕ} {x y : X} :
+    (x, y) ∈ dynEntourage' T U n ↔ ∀ k < n, (T^[k] x, T^[k] y) ∈ U := by
+  simp [dynEntourage']
+  rw [UniformFun.mem_gen]
+  rw [← UniformFun.toFun_ofFun (fun k : Fin n ↦ T^[k] x)]
+  sorry
+
+lemma mem_ball_dynEntourage' {X : Type*} {T : X → X} {U : Set (X × X)} {n : ℕ} {x y : X} :
+    y ∈ ball x (dynEntourage' T U n) ↔ ∀ k < n, T^[k] y ∈ ball (T^[k] x) U := by
+  simp only [ball, mem_preimage]; exact mem_dynEntourage'
+
+lemma idRel_subset_dynEntourage' {X : Type*} (T : X → X) {U : Set (X × X)} (h : idRel ⊆ U) (n : ℕ) :
+    idRel ⊆ dynEntourage' T U n := by
+  simp only [dynEntourage', idRel_subset, mem_setOf_eq]
+  exact fun _ ↦ UniformFun.idRel_subset_gen (Fin n) h (mem_idRel.2 (Eq.refl _))
+
+lemma _root_.SymmetricRel.dynEntourage' {X : Type*} (T : X → X) {U : Set (X × X)}
+    (h : SymmetricRel U) (n : ℕ) :
+    SymmetricRel (dynEntourage' T U n) := by
+  ext xy
+  simp only [Dynamics.dynEntourage', preimage_setOf_eq, fst_swap, snd_swap, mem_setOf_eq]
+  exact (h.uniformFun_gen (Fin n)).mk_mem_comm
+
+
+
+
+
+
+
+end Dynamics
+
+#lint
+
+/--
 /-- The dynamical entourage associated to a transformation `T`, entourage `U` and time `n`
 is the set of points `(x, y)` such that `(T^[k] x, T^[k] y) ∈ U` for all `k < n`, i.e.
 which are `U`-close up to time `n`.-/
@@ -133,5 +197,4 @@ lemma dynEntourage_entourageProd {Y : Type*} (S : X → X) (T : Y → Y) (U : Se
   rw [entourageProd, entourageProd, mem_dynEntourage]
   simp only [mem_dynEntourage, mem_setOf_eq, map_iterate, map_fst, map_snd]
   exact forall₂_and
-
-end Dynamics
+-/

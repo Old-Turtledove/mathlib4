@@ -84,9 +84,9 @@ jobs:
         shell: bash # just in case
         run: |
           set -eo pipefail
-          title=${{github.event.pull_request.title}}
+          title="${{github.event.pull_request.title}}"
           echo $title
-          label_names=${{github.event.pull_request.labels[*].name}}
+          label_names=$(echo "${{ toJson(github.event.pull_request.labels) }}" | jq -r '.[].name')
           echo $label_names
           lake exe check-title-labels $title $label_names
 

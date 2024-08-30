@@ -7,6 +7,14 @@ Authors: Michael Rothgang
 import Cli.Basic
 import Batteries.Data.HashMap
 
+/-!
+# Main docstring: TODO!
+-/
+
+/--
+Check if `title` matches the mathlib conventions for PR titles.
+Return the number of individual violations found.
+-/
 def validate_title(title: String) : IO UInt32 := do
   -- The title should be of the form "abbrev: main title" or "abbrev(scope): main title".
   let parts := title.splitOn ":"
@@ -43,6 +51,10 @@ def validate_title(title: String) : IO UInt32 := do
   return numberErrors
 
 
+/--
+Check if a combination of PR labels is considered contradictory.
+`labels` contains the names of this PR's labels.
+-/
 def has_contradictory_labels(labels : List String) : Bool := Id.run do
   -- Combine common labels.
   let substitutions := [
@@ -69,9 +81,9 @@ def has_contradictory_labels(labels : List String) : Bool := Id.run do
 
 
 open Cli in
-/-- Implementation of the `mk_all` command line program.
-The exit code is the number of files that the command updates/creates. -/
-def checkTitleLabelCLI (args : Parsed) : IO UInt32 := do
+/-- Implementation of the `check-title-labels` command line program.
+The exit code is the number of violations found. -/
+def checkTitleLabelsCLI (args : Parsed) : IO UInt32 := do
   let title := (args.positionalArg! "title").value
   let labels : String := (args.positionalArg! "labels").value
   let labels := labels.splitOn " "
@@ -91,16 +103,17 @@ def checkTitleLabelCLI (args : Parsed) : IO UInt32 := do
   return numberErrors
 
 open Cli in
-/-- Setting up command line options and help text for `lake exe check-title-label`. -/
-def checkTitleLabel : Cmd := `[Cli|
-  «check-title-label» VIA checkTitleLabelCLI; ["0.0.1"]
+/-- Setting up command line options and help text for `lake exe check-title-labels`. -/
+def checkTitleLabels : Cmd := `[Cli|
+  «check-title-labels» VIA checkTitleLabelsCLI; ["0.0.1"]
   "Check that a PR title matches the formatting requirements.
-  If this PR is a feature PR, also verify that it has a topic label."
+  If this PR is a feature PR, also verify that it has a topic label,
+  and that there are no contradictory labels."
 
   ARGS:
     title : String; "this PR's title"
     labels : String; "space-separated list of label names of this PR"
 ]
 
-/-- The entrypoint to the `lake exe check-title-label` command. -/
-def main (args : List String) : IO UInt32 := checkTitleLabel.validate args
+/-- The entrypoint to the `lake exe check-title-labels` command. -/
+def main (args : List String) : IO UInt32 := checkTitleLabels.validate args

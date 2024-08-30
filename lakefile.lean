@@ -106,7 +106,8 @@ lean_exe «lint-style» where
   srcDir := "scripts"
 
 /-- `lake exe check-title-labels` checks if a PR title is correctly formatted,
-and if the PR has required area labels. -/
+if the PR has some required area labels (or is not a feature PR) and
+if there are no contradictory labels. -/
 lean_exe «check-title-labels» where
   srcDir := "scripts"
 

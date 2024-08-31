@@ -45,8 +45,7 @@ abbrev mathlibLeanOptions := #[
 package mathlib where
   leanOptions := mathlibLeanOptions ++ #[
     ⟨`weak.aesop.collectStats, true⟩,
-    ⟨`weak.aesop.check.script, true⟩,
-    ⟨`weak.aesop.check.script.steps, true⟩
+    ⟨`weak.aesop.dev.generateScript, true⟩
   ]
   -- Mathlib also enforces these linter options, which are not active by default.
   moreServerOptions := mathlibOnlyLinters

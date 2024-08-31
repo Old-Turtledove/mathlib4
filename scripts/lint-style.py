@@ -65,7 +65,7 @@ with SCRIPTS_DIR.joinpath("style-exceptions.txt").open(encoding="utf-8") as f:
         }
         if errno in map:
             exceptions += [(map[errno], path, None)]
-        elif errno in ["ERR_COP", "ERR_ADN", "ERR_DOT"]:
+        elif errno in ["ERR_COP", "ERR_ADN", "ERR_DOT", "ERR_UIMP"]:
             pass # maintained by the Lean style linter now
         else:
             print(f"Error: unexpected errno in style-exceptions.txt: {errno}")

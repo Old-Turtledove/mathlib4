@@ -62,6 +62,7 @@ inductive StyleError where
   /-- Lint against "too broad" imports, such as `Mathlib.Tactic` or any module in `Lake`
   (unless carefully measured) -/
   | broadImport (module : BroadImports)
+  | unsortedImports
 deriving BEq
 
 /-- How to format style errors -/
@@ -90,6 +91,7 @@ def StyleError.errorMessage (err : StyleError) : String := match err with
       "In the past, importing 'Lake' in mathlib has led to dramatic slow-downs of the linter (see \
       e.g. mathlib4#13779). Please consider carefully if this import is useful and make sure to \
       benchmark it. If this is fine, feel free to allow this linter."
+  | StyleError.unsortedImports => "Unsorted imports (possible import order dependency)"
 
 /-- The error code for a given style error. Keep this in sync with `parse?_errorContext` below! -/
 -- FUTURE: we're matching the old codes in `lint-style.py` for compatibility;
@@ -99,6 +101,7 @@ def StyleError.errorCode (err : StyleError) : String := match err with
   | StyleError.authors => "ERR_AUT"
   | StyleError.adaptationNote => "ERR_ADN"
   | StyleError.broadImport _ => "ERR_IMP"
+  | StyleError.unsortedImports => "ERR_UIMP"
 
 /-- Context for a style error: the actual error, the line number in the file we're reading
 and the path to the file. -/
@@ -190,6 +193,7 @@ def parse?_errorContext (line : String) : Option ErrorContext := Id.run do
             some (StyleError.broadImport BroadImports.TacticFolder)
           else
             some (StyleError.broadImport BroadImports.Lake)
+        | "ERR_UIMP" => some (StyleError.unsortedImports)
         | _ => none
       match String.toNat? lineNumber with
       | some n => err.map fun e ↦ (ErrorContext.mk e n path)
@@ -276,6 +280,22 @@ def adaptationNoteLinter : TextbasedLinter := fun lines ↦ Id.run do
     lineNumber := lineNumber + 1
   return errors
 
+/-- Lint on a collection of input strings if imports are not alphabetically sorted. -/
+def unsortedImportsLinter : TextbasedLinter := fun lines ↦ Id.run do
+  let mut imports := Array.mkEmpty 0
+  let mut lineNumber := 1
+  let mut firstLineWithImports := 0
+  for line in lines do
+    if line.startsWith "import " then
+      imports := imports.push line
+      if firstLineWithImports == 0 then
+        firstLineWithImports := lineNumber
+    lineNumber := lineNumber + 1
+  let mut errors := Array.mkEmpty 0
+  if imports != imports.qsort (· < ·) then
+    errors := errors.push (StyleError.unsortedImports, firstLineWithImports)
+  return errors
+
 /-- Lint a collection of input strings if one of them contains an unnecessarily broad import. -/
 def broadImportsLinter : TextbasedLinter := fun lines ↦ Id.run do
   let mut errors := Array.mkEmpty 0
@@ -316,7 +336,7 @@ end
 
 /-- All text-based linters registered in this file. -/
 def allLinters : Array TextbasedLinter := #[
-    copyrightHeaderLinter, adaptationNoteLinter, broadImportsLinter
+    copyrightHeaderLinter, adaptationNoteLinter, broadImportsLinter, unsortedImportsLinter
   ]
 
 /-- Controls what kind of output this programme produces. -/

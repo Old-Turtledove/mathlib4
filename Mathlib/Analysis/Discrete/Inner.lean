@@ -25,7 +25,7 @@ variable [CommSemiring R] [StarRing R] [DistribSMul S R]
 /-- Inner product giving rise to the discrete L2 norm. -/
 def dL2Inner (f g : ι → R) : R := ∑ i, conj (f i) * g i
 
-notation "⟪" f ", " g "⟫_[" S "]" => dL2Inner (R := S) f g
+@[inherit_doc] notation "⟪" f ", " g "⟫_[" S "]" => dL2Inner (R := S) f g
 
 lemma dL2Inner_eq_sum (f g : ι → R) : ⟪f, g⟫_[R] = ∑ i, conj (f i) * g i := rfl
 

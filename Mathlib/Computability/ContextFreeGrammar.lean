@@ -29,8 +29,6 @@ structure ContextFreeRule (T : Type uT) (N : Type uN) where
   input : N
   /-- Output string a.k.a. right-hand side. -/
   output : List (Symbol T N)
-deriving
-  DecidableEq
 
 /-- Context-free grammar that generates words over the alphabet `T` (a type of terminals). -/
 structure ContextFreeGrammar.{uN,uT} (T : Type uT) where
@@ -81,7 +79,7 @@ lemma rewrites_of_exists_parts (r : ContextFreeRule T N) (p q : List (Symbol T N
 /-- Rule `r` rewrites string `u` is to string `v` iff they share both a prefix `p` and postfix `q`
 such that the remaining middle part of `u` is the input of `r` and the remaining middle part
 of `u` is the output of `r`. -/
-theorem rewrites_iff (u v : List (Symbol T N)) :
+theorem rewrites_iff :
     r.Rewrites u v ↔ ∃ p q : List (Symbol T N),
       u = p ++ [Symbol.nonterminal r.input] ++ q ∧ v = p ++ r.output ++ q :=
   ⟨Rewrites.exists_parts, by rintro ⟨p, q, rfl, rfl⟩; apply rewrites_of_exists_parts⟩

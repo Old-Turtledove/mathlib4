@@ -241,7 +241,7 @@ lemma rewrites_reverse : r.reverse.Rewrites u.reverse v.reverse ↔ r.Rewrites u
 end ContextFreeRule
 
 namespace ContextFreeGrammar
-variable {g : ContextFreeGrammar T} {s u v : List (Symbol T g.NT)} {w : List T}
+variable {g : ContextFreeGrammar T} {u v : List (Symbol T g.NT)} {w : List T}
 
 /-- Grammar for a reversed language. -/
 @[simps] def reverse (g : ContextFreeGrammar T) : ContextFreeGrammar T :=
@@ -295,8 +295,7 @@ alias ⟨_, Generates.reverse⟩ := generates_reverse
 end ContextFreeGrammar
 
 /-- The class of context-free languages is closed under reversal. -/
-theorem Language.IsContextFree.reverse (L : Language T) :
-    L.IsContextFree → L.reverse.IsContextFree := by
-  rintro ⟨g, rfl⟩; exact ⟨g.reverse, by simp⟩
+theorem Language.IsContextFree.reverse (L : Language T) : 
+    L.IsContextFree → L.reverse.IsContextFree := by rintro ⟨g, rfl⟩; exact ⟨g.reverse, by simp⟩
 
 end closure_reversal

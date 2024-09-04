@@ -58,7 +58,7 @@ lemma dL2Inner_smul_left [Star S] [StarModule S R] [IsScalarTower S R R] (c : S)
     ⟪c • f, g⟫_[R] = star c • ⟪f, g⟫_[R] := by
   simp only [dL2Inner_eq_sum, Pi.smul_apply, smul_mul_assoc, smul_sum, starRingEnd_apply, star_smul]
 
-lemma dL2Inner_smul_right [Star S] [SMulCommClass S R R] (c : S) (f g : ι → R) :
+lemma dL2Inner_smul_right [SMulCommClass S R R] (c : S) (f g : ι → R) :
     ⟪f, c • g⟫_[R] = c • ⟪f, g⟫_[R] := by
   simp only [dL2Inner_eq_sum, Pi.smul_apply, mul_smul_comm, smul_sum, starRingEnd_apply, star_smul]
 

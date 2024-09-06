@@ -289,7 +289,19 @@ theorem lift_card_closure_le :
   refine lift_card_closure_le_card_term.trans (Term.card_le.trans ?_)
   rw [mk_sum, lift_umax.{w, u}]
 
+lemma mem_closed_iff (s : Set M) :
+    s ∈ (closure L).closed ↔ ∀ {n}, ∀ f : L.Functions n, ClosedUnder f s := by
+  refine ⟨fun h n f => ?_, fun h => ?_⟩
+  · rw [← h]
+    exact Substructure.fun_mem _ _
+  · have h' : closure L s = ⟨s, h⟩ := closure_eq_of_le (refl _) subset_closure
+    exact congr_arg _ h'
+
 variable (L)
+
+@[simp]
+lemma mem_closed_of_isRelational [L.IsRelational] (s : Set M) : s ∈ (closure L).closed :=
+  (mem_closed_iff s).2 isEmptyElim
 
 theorem _root_.Set.Countable.substructure_closure
     [Countable (Σl, L.Functions l)] (h : s.Countable) : Countable.{w + 1} (closure L s) := by
@@ -864,7 +876,7 @@ theorem subtype_substructureEquivMap (f : M ↪[L] N) (s : L.Substructure M) :
   ext; rfl
 
 /-- The equivalence between the domain and the range of an embedding `f`. -/
-noncomputable def equivRange (f : M ↪[L] N) : M ≃[L] f.toHom.range where
+@[simps toEquiv_apply] noncomputable def equivRange (f : M ↪[L] N) : M ≃[L] f.toHom.range where
   toFun := codRestrict f.toHom.range f f.toHom.mem_range_self
   invFun n := Classical.choose n.2
   left_inv m :=

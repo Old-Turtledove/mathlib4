@@ -1171,7 +1171,7 @@ end NoZeroSMulDivisors
 
 open Lean.Meta Qq
 
-/-- Positivity extension for HSMul, i.e. (_ • _).  -/
+/-- Positivity extension for HSMul, i.e. (_ • _). -/
 @[positivity HSMul.hSMul _ _]
 def evalHSMul : PositivityExt where eval {_u α} zα pα (e : Q($α)) := do
   let .app (.app (.app (.app (.app (.app

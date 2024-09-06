@@ -30,8 +30,8 @@ lemma ConvexOn.exists_lipschitzOnWith_of_isBounded (hf : ConvexOn ℝ (ball x₀
     obtain rfl | hxy := eq_or_ne x y
     · simp
     have hx₀r : ball x₀ (r - ε) ⊆ ball x₀ r := ball_subset_ball <| by linarith
-    have hx' :  x ∈ ball x₀ r := hx₀r hx
-    have hy' :  y ∈ ball x₀ r := hx₀r hy
+    have hx' : x ∈ ball x₀ r := hx₀r hx
+    have hy' : y ∈ ball x₀ r := hx₀r hy
     let z := x + (ε / ‖x - y‖) • (x - y)
     replace hxy : 0 < ‖x - y‖ := by rwa [norm_sub_pos_iff]
     have hz : z ∈ ball x₀ r := mem_ball_iff_norm.2 <| by
@@ -70,11 +70,13 @@ lemma ConcaveOn.exists_lipschitzOnWith_of_isBounded (hf : ConcaveOn ℝ (ball x�
   replace hf' : IsBounded ((-f) '' ball x₀ r) := by convert hf'.neg; ext; simp [neg_eq_iff_eq_neg]
   simpa using hf.neg.exists_lipschitzOnWith_of_isBounded hε hf'
 
-lemma ConvexOn.continuousOn_tfae (hC : IsOpen C) (hC' : C.Nonempty) (hf : ConvexOn ℝ C f) :
-    TFAE [LocallyLipschitzOn C f, ContinuousOn f C, ∃ x₀ ∈ C, ContinuousAt f x₀,
-      ∃ x₀ ∈ C, (𝓝 x₀).IsBoundedUnder (· ≤ ·) f,
-      ∀ ⦃x⦄, x ∈ C → (𝓝 x).IsBoundedUnder (· ≤ ·) f,
-      ∀ ⦃x⦄, x ∈ C → (𝓝 x).IsBoundedUnder (· ≤ ·) |f|] := by
+lemma ConvexOn.continuousOn_tfae (hC : IsOpen C) (hC' : C.Nonempty) (hf : ConvexOn ℝ C f) : TFAE [
+    LocallyLipschitzOn C f,
+    ContinuousOn f C,
+    ∃ x₀ ∈ C, ContinuousAt f x₀,
+    ∃ x₀ ∈ C, (𝓝 x₀).IsBoundedUnder (· ≤ ·) f,
+    ∀ ⦃x⦄, x ∈ C → (𝓝 x).IsBoundedUnder (· ≤ ·) f,
+    ∀ ⦃x⦄, x ∈ C → (𝓝 x).IsBoundedUnder (· ≤ ·) |f|] := by
   tfae_have 1 → 2
   · exact LocallyLipschitzOn.continuousOn
   tfae_have 2 → 3
@@ -137,11 +139,12 @@ lemma ConvexOn.continuousOn_tfae (hC : IsOpen C) (hC' : C.Nonempty) (hf : Convex
     exact ⟨K, _, ball_mem_nhds _ (by simpa), hK⟩
   tfae_finish
 
-lemma ConcaveOn.continuousOn_tfae (hC : IsOpen C) (hC' : C.Nonempty) (hf : ConcaveOn ℝ C f) :
-    TFAE [LocallyLipschitzOn C f, ContinuousOn f C, ∃ x₀ ∈ C, ContinuousAt f x₀,
-      ∃ x₀ ∈ C, (𝓝 x₀).IsBoundedUnder (· ≥ ·) f,
-      ∀ ⦃x⦄, x ∈ C → (𝓝 x).IsBoundedUnder (· ≥ ·) f,
-      ∀ ⦃x⦄, x ∈ C → (𝓝 x).IsBoundedUnder (· ≤ ·) |f|] := by
+lemma ConcaveOn.continuousOn_tfae (hC : IsOpen C) (hC' : C.Nonempty) (hf : ConcaveOn ℝ C f) : TFAE [
+    LocallyLipschitzOn C f,
+    ContinuousOn f C, ∃ x₀ ∈ C, ContinuousAt f x₀,
+    ∃ x₀ ∈ C, (𝓝 x₀).IsBoundedUnder (· ≥ ·) f,
+    ∀ ⦃x⦄, x ∈ C → (𝓝 x).IsBoundedUnder (· ≥ ·) f,
+    ∀ ⦃x⦄, x ∈ C → (𝓝 x).IsBoundedUnder (· ≤ ·) |f|] := by
   have := hf.neg.continuousOn_tfae hC hC'
   simp at this
   convert this using 8 <;> exact (Equiv.neg ℝ).exists_congr (by simp)
